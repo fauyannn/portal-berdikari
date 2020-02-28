@@ -16,6 +16,8 @@ class CreateTablePurchaseOrder extends Migration
         Schema::create('purchase_order', function (Blueprint $table) {
             $table->increments('id');
             $table->string('purchase_order_number')->nullable();
+            $table->date('purchase_order_date')->nullable();
+            $table->integer('total_amount')->nullable();
             $table->timestamps();
         });
     }

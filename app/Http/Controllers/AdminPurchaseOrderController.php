@@ -20,6 +20,7 @@
 		}
 
 	    public function cbInit() {
+
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
@@ -38,12 +39,12 @@
 			$this->button_export = false;
 			$this->table = "purchase_order";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
-			
+
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Purchase Order Number","name"=>"purchase_order_number"];
-			$this->col[] = ["label"=>"Purchase Order Date","name"=>"created_at"];
-			$this->col[] = ["label"=>"Total Amount","name"=>"id"];
+			$this->col[] = ["label"=>"Purchase Order Date","name"=>"purchase_order_date"];
+			$this->col[] = ["label"=>"Total Amount","name"=>"total_amount"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -55,7 +56,9 @@
 			//$this->form = [];
 			//$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			# OLD END FORM
+
 			// pr($this,1);
+
 			/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
@@ -164,7 +167,7 @@
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
-	        $this->pre_index_html = null;
+			$this->pre_index_html = $this->generate_listdata();
 	        
 	        
 	        
@@ -240,48 +243,7 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			//Your code here
-			$doctype 		= 'Purchase Order';
-			$start 			= request()->get('start')?:0;
-			$page_length 	= request()->get('page_length')?:20;
-			$fields 		= "name, transaction_date, grand_total";
-			$order_by 		= request()->get('order_by')?:'creation desc';
-
-			// $params = '?doctype='.$doctype.'&start='.$start.'&page_length='.$page_length.'&fields='.$fields;
-
-			$_url = '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
-			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res = $client->request('GET', $this->_host.$_url, [
-				'query' => [
-					'doctype' => $doctype,
-					'start' => $start,
-					'page_length' => $page_length,
-					'fields' => $fields,
-					'order_by' => $order_by
-					]
-			]);
-			$data = json_decode($res->getBody()->getContents());
-
-			$datas = $data->message->data;
-			// pr($datas,1);			
-			echo "<table id='temp' style='display:none;'>";
-			if($datas){	
-				foreach($datas as $key => $val){
-					$id = $val->name;
-					$return_url = '?return_url=http%3A%2F%2F127.0.0.1%3A8000%2Fadmin%2Fpurchase_order';
-					$url = CRUDBooster::mainpath('show/'.$id);
-										
-					echo "<tr>
-							<td></td>
-							<td>".$val->name."</td>
-							<td>".$val->transaction_date."</td>
-							<td class='right'>Rp ".formatMoney($val->grand_total)."</td>
-							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
-						</tr>";
-				}	
-			}
-			echo "</table>";
-
+			//Your code here			
 	    }
 
 	    /*
@@ -368,6 +330,70 @@
 	    }
 
 	    //By the way, you can still create your own method in here... :) 
+
+
+		private function generate_listdata(){
+			// pr($_GET);
+
+			$order_by 		= 'name desc';
+			$arrfield = [
+				'purchase_order.purchase_order_number'=>'name',
+				'purchase_order.purchase_order_date' => 'transaction_date',
+				'purchase_order.total_amount' => 'grand_total'
+				];
+			if($_GET['filter_column']){
+				foreach($_GET['filter_column'] as $key => $val){
+					if(@$val['sorting']){						
+						$order_by = @$arrfield[$key].' '.$val['sorting'];
+					}
+					
+				}
+			}
+
+			$doctype 		= 'Purchase Order';
+			$start 			= request()->get('start')?:0;
+			$page_length 	= request()->get('limit')?:20;
+			$fields 		= "name, transaction_date, grand_total";
+			
+			
+			$_url = '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res = $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+
+			$datas = $data->message->data;
+			// pr($datas,1);			
+
+			$total_rows = 'Total rows : 0 to 0 of '.$data->message->total_data;
+			
+			$datalist = "<table id='temp' style='display:none;'>";
+			if($datas){	
+				foreach($datas as $key => $val){
+					$id = $val->name;
+					$return_url = '?return_url=http%3A%2F%2F127.0.0.1%3A8000%2Fadmin%2Fpurchase_order';
+					$url = CRUDBooster::mainpath('show/'.$id);
+										
+					$datalist .= "<tr>
+							<td></td>
+							<td>".$val->name."</td>
+							<td>".$val->transaction_date."</td>
+							<td class='right'>Rp ".formatMoney($val->grand_total)."</td>
+							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
+						</tr>";
+				}	
+			}
+			$datalist .= "</table>";
+			$datalist .= '<div id="total_rows" style="display:none;">'.$total_rows.'</div>';
+			return $datalist;
+		}
 
 		public function getShow($id){
 			$items = [];
