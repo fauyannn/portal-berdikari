@@ -337,9 +337,9 @@
 
 			$order_by 		= 'name desc'; //default
 			$arrfield = [
-				'purchase_order.purchase_order_number'=>'name',
-				'purchase_order.purchase_order_date' => 'transaction_date',
-				'purchase_order.total_amount' => 'grand_total'
+				$this->table.'.purchase_order_number'=>'name',
+				$this->table.'.purchase_order_date' => 'transaction_date',
+				$this->table.'.total_amount' => 'grand_total'
 				];
 			if($_GET['filter_column']){
 				foreach($_GET['filter_column'] as $key => $val){

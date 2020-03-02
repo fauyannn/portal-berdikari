@@ -5,7 +5,7 @@
 	use DB;
 	use CRUDBooster;
 
-	class AdminDeliveryNotesController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminPurchaseInvoicesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
@@ -25,22 +25,21 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "delivery_notes";
+			$this->table = "purchase_invoices";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Purchase Order","name"=>"purchase_order"];
-			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
-			$this->col[] = ["label"=>"Supplier Delivery Note","name"=>"supplier_delivery_note"];
-			$this->col[] = ["label"=>"Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Supplier Invoice Number","name"=>"supplier_invoice_number"];
+			$this->col[] = ["label"=>"Supplier Date","name"=>"supplier_date"];
+			$this->col[] = ["label"=>"Purchase Order Number","name"=>"purchase_order_number"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			
 			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
@@ -49,15 +48,15 @@
 			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			
-			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
+			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9','table'=>'purchase_invoice_items','foreign_key'=>'id_purchase_invoice'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Items','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
+			//$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Items','name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'purchase_invoice_items','foreign_key'=>'id_purchase_invoice'];
 			# OLD END FORM
 
 			/* 
@@ -278,10 +277,9 @@
 	    | 
 	    */
 	    public function hook_after_add($id) {        
-	        //Your code here
-			\DB::table('delivery_note_items')
-			->where('delivery_note_id',null)
-			->update(['delivery_note_id'=>$id]);
+	        \DB::table('purchase_invoice_items')
+			->where('id_purchase_invoice',null)
+			->update(['id_purchase_invoice'=>$id]);
 	    }
 
 	    /* 
