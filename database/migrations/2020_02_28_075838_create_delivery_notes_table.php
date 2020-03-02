@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTablePurchaseOrder extends Migration
+class CreateDeliveryNotesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateTablePurchaseOrder extends Migration
      */
     public function up()
     {
-        Schema::create('purchase_order', function (Blueprint $table) {
+        Schema::create('delivery_notes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('purchase_order_number')->nullable();
-            $table->date('purchase_order_date')->nullable();
-            $table->integer('total_amount')->nullable();
+            $table->string('purchase_order')->nullable();
+            $table->string('supplier')->nullable();
+            $table->text('supplier_delivery_note')->nullable();
+            $table->text('qr_code')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreateTablePurchaseOrder extends Migration
      */
     public function down()
     {
-        Schema::drop('purchase_order');
+        Schema::drop('delivery_notes');
     }
 }

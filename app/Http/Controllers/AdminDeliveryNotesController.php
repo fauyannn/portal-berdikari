@@ -4,20 +4,8 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-	// use Guzzle;
 
-	class AdminPurchaseOrderController extends \crocodicstudio\crudbooster\controllers\CBController {
-
-		private $_datas = [];
-		private $_host;
-		private $_token;
-
-		function __construct()
-		{
-			$env = env_api('dev1');
-			$this->_host = $env['host'];
-			$this->_token = $env['token'];
-		}
+	class AdminDeliveryNotesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
@@ -37,27 +25,40 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "purchase_orders";
+			$this->table = "delivery_notes";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Purchase Order Number","name"=>"purchase_order_number"];
-			$this->col[] = ["label"=>"Purchase Order Date","name"=>"purchase_order_date"];
-			$this->col[] = ["label"=>"Total Amount","name"=>"total_amount"];
+			$this->col[] = ["label"=>"Purchase Order","name"=>"purchase_order"];
+			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
+			$this->col[] = ["label"=>"Supplier Delivery Note","name"=>"supplier_delivery_note"];
+			$this->col[] = ["label"=>"Date","name"=>"created_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
+			
+			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			
+			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Items','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
 			# OLD END FORM
-
-			// pr($this,1);
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -156,7 +157,7 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-			$this->script_js = null;
+	        $this->script_js = NULL;
 
 
             /*
@@ -167,7 +168,7 @@
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
-			$this->pre_index_html = $this->generate_listdata();
+	        $this->pre_index_html = null;
 	        
 	        
 	        
@@ -192,7 +193,7 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        $this->load_js[] = asset("js/mypo.js");
+	        
 	        
 	        
 	        /*
@@ -203,7 +204,7 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = ".right{float:right;}";
+	        $this->style_css = NULL;
 	        
 	        
 	        
@@ -243,7 +244,8 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			//Your code here			
+	        //Your code here
+	            
 	    }
 
 	    /*
@@ -253,7 +255,7 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-			//Your code here
+	    	//Your code here
 	    }
 
 	    /*
@@ -277,7 +279,9 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
-
+			\DB::table('delivery_note_items')
+			->where('delivery_note_id',null)
+			->update(['delivery_note_id'=>$id]);
 	    }
 
 	    /* 
@@ -329,80 +333,9 @@
 
 	    }
 
+
+
 	    //By the way, you can still create your own method in here... :) 
 
-
-		private function generate_listdata(){
-			// pr($_GET);
-
-			$order_by 		= 'name desc'; //default
-			$arrfield = [
-				'purchase_order.purchase_order_number'=>'name',
-				'purchase_order.purchase_order_date' => 'transaction_date',
-				'purchase_order.total_amount' => 'grand_total'
-				];
-			if($_GET['filter_column']){
-				foreach($_GET['filter_column'] as $key => $val){
-					if(@$val['sorting']){						
-						$order_by = @$arrfield[$key].' '.$val['sorting'];
-					}
-					
-				}
-			}
-
-			$doctype 		= 'Purchase Order';
-			$start 			= request()->get('start')?:0;
-			$page_length 	= request()->get('limit')?:20;
-			$fields 		= "name, transaction_date, grand_total";
-			
-			
-			$_url = '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
-			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res = $client->request('GET', $this->_host.$_url, [
-				'query' => [
-					'doctype' => $doctype,
-					'start' => $start,
-					'page_length' => $page_length,
-					'fields' => $fields,
-					'order_by' => $order_by
-					]
-			]);
-			$data = json_decode($res->getBody()->getContents());
-
-			$datas = $data->message->data;
-			// pr($datas,1);			
-
-			$total_rows = 'Total rows : 0 to 0 of '.$data->message->total_data;
-			
-			$datalist = "<table id='temp' style='display:none;'>";
-			if($datas){	
-				foreach($datas as $key => $val){
-					$id = $val->name;
-					$return_url = '?return_url=http%3A%2F%2F127.0.0.1%3A8000%2Fadmin%2Fpurchase_order';
-					$url = CRUDBooster::mainpath('show/'.$id);
-										
-					$datalist .= "<tr>
-							<td></td>
-							<td>".$val->name."</td>
-							<td>".$val->transaction_date."</td>
-							<td class='right'>Rp ".formatMoney($val->grand_total)."</td>
-							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
-						</tr>";
-				}	
-			}
-			$datalist .= "</table>";
-			$datalist .= '<div id="total_rows" style="display:none;">'.$total_rows.'</div>';
-			return $datalist;
-		}
-
-		public function getShow($id){
-			$items = [];
-			$_url = '/api/resource/Purchase Order/'.$id;
-			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res = $client->request('GET', $this->_host.$_url);
-			$data = json_decode($res->getBody()->getContents());
-			$data = $data->data;
-			return view('purchase_order_detail',compact('data'));
-		}
 
 	}
