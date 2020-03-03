@@ -27,7 +27,7 @@
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = true;
@@ -334,8 +334,8 @@
 
 		private function generate_listdata(){
 			// pr($_GET);
-
 			$order_by 		= 'name desc'; //default
+			$filters		= [];
 			$arrfield = [
 				$this->table.'.purchase_order_number'=>'name',
 				$this->table.'.purchase_order_date' => 'transaction_date',
@@ -346,25 +346,33 @@
 					if(@$val['sorting']){						
 						$order_by = @$arrfield[$key].' '.$val['sorting'];
 					}
-					
+					if(@$val['value']){
+						if($val['type']=='like'){
+							$filters[@$arrfield[$key]] = [$val['type'],'%'.$val['value'].'%'];
+						} else {
+							$filters[@$arrfield[$key]] = [$val['type'],$val['value']];
+						}
+					}
 				}
 			}
-
+			$filters = json_encode($filters);
+			// pr($filters);
 			$doctype 		= 'Purchase Order';
 			$start 			= request()->get('start')?:0;
 			$page_length 	= request()->get('limit')?:20;
 			$fields 		= "name, transaction_date, grand_total";
 			
 			
-			$_url = '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res = $client->request('GET', $this->_host.$_url, [
+			$res 	= $client->request('GET', $this->_host.$_url, [
 				'query' => [
 					'doctype' => $doctype,
 					'start' => $start,
 					'page_length' => $page_length,
 					'fields' => $fields,
-					'order_by' => $order_by
+					'order_by' => $order_by,
+					'filters' => $filters
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
@@ -382,7 +390,6 @@
 					$url = CRUDBooster::mainpath('show/'.$id);
 										
 					$datalist .= "<tr>
-							<td></td>
 							<td>".$val->name."</td>
 							<td>".$val->transaction_date."</td>
 							<td class='right'>Rp ".formatMoney($val->grand_total)."</td>
