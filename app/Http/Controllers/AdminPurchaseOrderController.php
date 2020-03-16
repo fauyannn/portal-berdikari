@@ -433,7 +433,7 @@
 				$url_full = $data->message->url_full;
 				$datalist .= '<div id="loadmore" style="display:none;">
 						<div style="text-align:center;">
-							<a id="url-loadmore" href="javascript:void(0)" data-href="'.$url_full.'" data-limit="'.$data->message->total_rows.'" data-totaldata="'.$data->message->total_data.'">load more</a>
+							<a id="url-loadmore" class="btn btn-xs btn-primary" href="javascript:void(0)" data-href="'.$url_full.'" data-limit="'.$data->message->total_rows.'" data-totaldata="'.$data->message->total_data.'">load more</a>
 						</div>
 						</div>';
 

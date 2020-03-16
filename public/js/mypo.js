@@ -13,16 +13,18 @@ $(document).ready(function(){
     var trows = _limit;
     var total_data = $('a#url-loadmore').data('totaldata');
     var start = 0;
+    var $this;
     $('a#url-loadmore').on('click',function(){
+        $this = $(this);
         start = parseInt(start+_limit);
-        var _url = $(this).data('href')+'&start='+start;
+        var _url = $this.data('href')+'&start='+start;
         console.log(_url)
         var datalist = '';
         console.log(trows +' -- '+total_data);
         if(trows >= total_data){
             return false;
         }
-
+        $this.text('loading...');
         $.get(_url, function(res){
             console.log(res.message);
             var modul_url = res.message.modul_url;
@@ -43,7 +45,7 @@ $(document).ready(function(){
             trows +=  parseInt(res.message.data.length);
             var total_rows = 'Total rows : '+trows+' of '+total_data;
             $('.box-body').find('span.pull-right').text(total_rows);
-
+            $this.text('load more');
             if(trows>=total_data){
                 $('a#url-loadmore').hide();
             }
