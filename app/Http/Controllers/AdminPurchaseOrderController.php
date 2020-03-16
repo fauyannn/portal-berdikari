@@ -332,8 +332,11 @@
 	    //By the way, you can still create your own method in here... :) 
 
 
-		private function generate_listdata(){
+		public function getQuery($id){
+			// $_GET			= $_GET;
+			$this->table = "purchase_orders";
 			// pr($_GET);
+			
 			$order_by 		= 'name desc'; //default
 			$filters		= [];
 			$arrfield = [
@@ -341,9 +344,10 @@
 				$this->table.'.purchase_order_date' => 'transaction_date',
 				$this->table.'.total_amount' => 'grand_total'
 				];
+				
 			if($_GET['filter_column']){
 				foreach($_GET['filter_column'] as $key => $val){
-					if(@$val['sorting']){						
+					if(@$val['sorting']){
 						$order_by = @$arrfield[$key].' '.$val['sorting'];
 					}
 					if(@$val['value']){
@@ -356,10 +360,10 @@
 				}
 			}
 			$filters = json_encode($filters);
-			// pr($filters);
+			// pr($order_by);
 			$doctype 		= 'Purchase Order';
-			$start 			= request()->get('start')?:0;
-			$page_length 	= request()->get('limit')?:20;
+			$start 			= $_GET['start']?:0;
+			$page_length 	= $_GET['limit']?:20;
 			$fields 		= "name, transaction_date, grand_total";
 			
 			
@@ -376,11 +380,38 @@
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
+			$data->message->modul_url = CRUDBooster::mainpath('');
+			$data->message->total_rows = $page_length;
+			$data->message->get_start = $_GET['start'];
+
+			 
+			// $url_full = str_replace('?','&',url()->full());
+			
+
+			$response = $data;
+			if(request()->ajax()){
+				$response =  response()->json($data);
+			}
+			else {
+				$url_full = url()->full(); 
+				$url_full = str_replace('?','&',$url_full);
+				$url_full = str_replace('/purchase_orders','/purchase_orders/query/1?e='.md5(0),$url_full);
+				$data->message->url_full = $url_full;
+				// pr($_GET);
+				// pr($data);				
+			}
+
+			return $response;			
+		}
+
+		private function generate_listdata(){
+			// pr($_GET);
+			$data = $this->getQuery($_GET);
 
 			$datas = $data->message->data;
-			// pr($datas,1);			
+			// pr($data->message);			
 
-			$total_rows = 'Total rows : 0 to 0 of '.$data->message->total_data;
+			$total_rows = 'Total rows : '.$data->message->total_rows.' of '.$data->message->total_data;
 			
 			$datalist = "<table id='temp' style='display:none;'>";
 			if($datas){	
@@ -398,6 +429,18 @@
 				}	
 			}
 			$datalist .= "</table>";
+			if($data->message->total_rows < $data->message->total_data){
+				$url_full = $data->message->url_full;
+				$datalist .= '<div id="loadmore" style="display:none;">
+						<div style="text-align:center;">
+							<a id="url-loadmore" href="javascript:void(0)" data-href="'.$url_full.'" data-limit="'.$data->message->total_rows.'" data-totaldata="'.$data->message->total_data.'">load more</a>
+						</div>
+						</div>';
+
+				// $dataArray = json_encode($data->message->data);
+				// $datalist .= $dataArray->render();
+			}
+			
 			$datalist .= '<div id="total_rows" style="display:none;">'.$total_rows.'</div>';
 			return $datalist;
 		}
