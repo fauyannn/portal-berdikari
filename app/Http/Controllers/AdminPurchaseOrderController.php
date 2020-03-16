@@ -14,7 +14,7 @@
 
 		function __construct()
 		{
-			$env = env_api('dev1');
+			$env = env_api(env('API_ERP', 'dev1'));
 			$this->_host = $env['host'];
 			$this->_token = $env['token'];
 		}
@@ -360,7 +360,7 @@
 				}
 			}
 			$filters = json_encode($filters);
-			// pr($order_by);
+			// pr($filters);
 			$doctype 		= 'Purchase Order';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:20;

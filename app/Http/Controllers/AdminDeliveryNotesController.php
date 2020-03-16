@@ -7,6 +7,16 @@
 
 	class AdminDeliveryNotesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		private $_datas = [];
+		private $_host;
+		private $_token;
+
+		function __construct()
+		{
+			$env = env_api(env('API_ERP', 'dev1'));
+			$this->_host = $env['host'];
+			$this->_token = $env['token'];
+		}
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -38,7 +48,11 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			
+			$this->form[] = ['label'=>'po','name'=>'purchase_order','type'=>'hidden'];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatablexx'=>'purchase_invoices,created_at','datatable_ajaxxx'=>true];
+			
+			// $this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order1','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'purchase_invoices,created_at','datatable_ajax'=>true];
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
 			
@@ -156,8 +170,9 @@
 	        | javascript code in the variable 
 	        | $this->script_js = "function() { ... }";
 	        |
-	        */
-	        $this->script_js = NULL;
+			*/
+			// pr($_GET);
+	        $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
 
 
             /*
@@ -192,8 +207,8 @@
 	        | $this->load_js[] = asset("myfile.js");
 	        |
 	        */
-	        $this->load_js = array();
-	        
+	        $this->load_js = array();	        
+	        $this->load_js[] = asset("js/delivery-note.js");
 	        
 	        
 	        /*
@@ -334,6 +349,46 @@
 	    }
 
 
+		public function getDeliverynote($id){
+			$order_by 		= 'name desc'; //default
+			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
+
+			$filters = json_encode($filters);
+			// pr($order_by);
+			$doctype 		= 'Delivery Note';
+			$start 			= $_GET['start']?:0;
+			$page_length 	= $_GET['limit']?:10;
+			$fields 		= "name, customer, posting_date, posting_time";
+			
+			
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+
+
+			$response = $data->message->data;
+			if($response){
+				foreach($response as $key => $val){
+					$response[$key]->id = $val->name;
+					$response[$key]->text = $val->name;
+				}
+			}
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+
+			return $response;			
+		}
 
 	    //By the way, you can still create your own method in here... :) 
 
