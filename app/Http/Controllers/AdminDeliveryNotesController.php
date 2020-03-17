@@ -50,9 +50,9 @@
 			$this->form = [];
 			
 			$this->form[] = ['label'=>'po','name'=>'purchase_order','type'=>'hidden'];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
 			
 			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
