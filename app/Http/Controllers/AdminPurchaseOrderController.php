@@ -14,7 +14,7 @@
 
 		function __construct()
 		{
-			$env = env_api(env('API_ERP', 'dev1'));
+			$env = env_api();
 			$this->_host = $env['host'];
 			$this->_token = $env['token'];
 		}

@@ -60,9 +60,23 @@ $(document).ready(function(){
             var val = $this.val();
             console.log(val);
             var _url = '/admin/delivery_notes/deliverynotedetail/1?idx='+val;
+            var data = [];
             $.get(_url, function(res){
-                console.log(res);
-                $('input#supplier').val(res.customer)
+                data = res.data;
+                console.log(data);
+                $('input#supplier').val(data.customer)
+                // insert items
+                $('table#table-items tbody').html('') //clear data childs
+                $.each(data.items,function(k,v){
+                    $('input#itemsitem_code').val(v.item_code)
+                    $('input#itemsitem_name').val(v.item_name)
+                    $('input#itemsqty').val(v.actual_qty)
+                    $('input#itemsuom').val(v.uom)
+                    $('input#itemsrate').val(v.rate)
+                    $('input#itemsamount').val(v.amount)
+                    $('input#btn-add-table-items').click()
+                })
+
             });
 
         })

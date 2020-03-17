@@ -13,7 +13,9 @@ function formatMoney($data, $point = 0) {
     return number_format($data,$point,',','.');
 }
 
-function env_api($env){
+function env_api(){
+    $env = env('API_ERP', 'dev1');
+    // pr($env);
     $data['local']['host'] = 'http://localhost:8080';
     $data['local']['token'] = 'token 335dfbc88231b23:af0f28f0fc2b9d5';
 
