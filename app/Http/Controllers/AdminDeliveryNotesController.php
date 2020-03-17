@@ -390,6 +390,39 @@
 			return $response;			
 		}
 
+		function getDeliverynotedetail($id){
+			$order_by 		= 'name desc'; //default
+			$filters		= ["name"=>["=",@$_GET['idx']]];
+
+			$filters = json_encode($filters);
+			// pr($order_by);
+			$doctype 		= 'Delivery Note';
+			$start 			= $_GET['start']?:0;
+			$page_length 	= $_GET['limit']?:1;
+			$fields 		= "name, customer, posting_date, posting_time";
+			
+			
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			$response = @$data->message->data[0];			
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+
+			return $response;	
+		}
+
 	    //By the way, you can still create your own method in here... :) 
 
 
