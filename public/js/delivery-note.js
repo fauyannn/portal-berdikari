@@ -1,5 +1,12 @@
 $(document).ready(function(){
-
+    $('div.child-form-area').parent().css('display','none');
+    $(document).on('click','a[onclick="editRowitems(this)"]',function(){
+        $('div.child-form-area').parent().css('display','block');
+    })
+    $(document).on('click','input#btn-add-table-items',function(){
+        $('div.child-form-area').parent().css('display','none');
+    })
+    
     $('table#table_dashboard tbody tr').each(function(k,_this){
         // console.log(_this)
         var $this = $(_this);
