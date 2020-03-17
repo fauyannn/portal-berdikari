@@ -7,6 +7,16 @@
 
 	class AdminPurchaseInvoicesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		private $_datas = [];
+		private $_host;
+		private $_token;
+
+		function __construct()
+		{
+			$env = env_api();
+			$this->_host = $env['host'];
+			$this->_token = $env['token'];
+		}
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -37,9 +47,12 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+
+			$this->form[] = ['label'=>'supplier_invoice_number','name'=>'supplier_invoice_number','type'=>'hidden'];
+			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'text','validation'=>'required|date','width'=>'col-sm-9','readonly'=>true];
+			$this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden'];
+			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			
 			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
@@ -156,7 +169,8 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+			// $this->script_js = NULL;
+			$this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
 
 
             /*
@@ -192,6 +206,7 @@
 	        |
 	        */
 	        $this->load_js = array();
+	        $this->load_js[] = asset("js/purchase-invoice.js");
 	        
 	        
 	        
@@ -331,8 +346,106 @@
 
 	    }
 
+		public function getPurchaseinvoice($id){
+			$order_by 		= 'name desc'; //default
+			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
+
+			$filters = json_encode($filters);
+			// pr($order_by);
+			$doctype 		= 'Purchase Invoice';
+			$start 			= $_GET['start']?:0;
+			$page_length 	= $_GET['limit']?:10;
+			$fields 		= "name, posting_date, posting_time";
+			
+			
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
 
 
+			$response = $data->message->data;
+			if($response){
+				foreach($response as $key => $val){
+					$response[$key]->id = $val->name;
+					$response[$key]->text = $val->name;
+				}
+			}
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+
+			return $response;			
+		}
+		
+		public function getPurchaseorder($id){
+			$order_by 		= 'name desc'; //default
+			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
+
+			$filters = json_encode($filters);
+			// pr($order_by);
+			$doctype 		= 'Purchase Order';
+			$start 			= $_GET['start']?:0;
+			$page_length 	= $_GET['limit']?:10;
+			$fields 		= "name";
+			
+			
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+
+
+			$response = $data->message->data;
+			if($response){
+				foreach($response as $key => $val){
+					$response[$key]->id = $val->name;
+					$response[$key]->text = $val->name;
+				}
+			}
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+
+			return $response;			
+		}
+
+		function getPurchaseinvoicedetail($id){			
+			$doctype = 'Purchase Invoice';
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_data_detail';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'id' => $_GET['idx']
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			$response = @$data->message;			
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+			// $response =  response()->json($response);
+			return $response;	
+		}
 	    //By the way, you can still create your own method in here... :) 
 
 

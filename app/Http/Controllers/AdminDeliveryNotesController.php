@@ -50,9 +50,7 @@
 			$this->form = [];
 			
 			$this->form[] = ['label'=>'po','name'=>'purchase_order','type'=>'hidden'];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatablexx'=>'purchase_invoices,created_at','datatable_ajaxxx'=>true];
-			
-			// $this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order1','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'purchase_invoices,created_at','datatable_ajax'=>true];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
 			
@@ -409,6 +407,9 @@
 			return $response;	
 		}
 
+		function getJson($id){
+			
+		}
 	    //By the way, you can still create your own method in here... :) 
 
 
