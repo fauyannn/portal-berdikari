@@ -19,6 +19,7 @@ class CBSeeder extends Seeder
         $this->call('Cms_privileges_rolesSeeder');
         $this->call('Cms_settingsSeeder');
         $this->call('CmsEmailTemplates');
+        $this->call('PortalSeeder');        
 
         $this->command->info('Updating the data completed !');
     }

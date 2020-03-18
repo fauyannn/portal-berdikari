@@ -18,7 +18,8 @@
 			$this->_token = $env['token'];
 		}
 	    public function cbInit() {
-
+// pr( md5('b6a7aaa47e18b4890403794a39cc43f4'.'1584502967'.$_SERVER['USER_AGENT'] ));
+// pr(time());
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
@@ -408,7 +409,23 @@
 		}
 
 		function getJson($id){
-			
+			$_url = 'http://127.0.0.1:8000/api/delivery_note';
+			$time = time();
+			$auth = [
+				[
+					'x-authorization-token' => md5('b6a7aaa47e18b4890403794a39cc43f4'.$time.$_SERVER['USER_AGENT'] ),
+					'x-authorization-time' => $time
+				]
+			];
+			$client = new \GuzzleHttp\Client(['headers' => $auth]);
+			$res 	= $client->request('GET', $_url, [
+				'query' => [
+					'purchase_order' => $id
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			$data = [32];
+			return $data;
 		}
 	    //By the way, you can still create your own method in here... :) 
 
