@@ -30,6 +30,8 @@
 				//This method will be execute after run the main process
 				$id = $result['id'];
 
+				unset($result['api_response_fields']);
+				unset($result['qr_code']);
 				$items = \DB::table('delivery_note_items')
 				->select('item_code','item_name','qty','uom','rate','amount')
 				->where('delivery_note_id',$id)
