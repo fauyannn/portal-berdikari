@@ -5,7 +5,7 @@
 	use DB;
 	use CRUDBooster;
 
-	class AdminDeliveryNotesController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminStockController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 		private $_datas = [];
 		private $_host;
@@ -18,8 +18,9 @@
 			$this->_token = $env['token'];
 		}
 	    public function cbInit() {
+
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "id";
+			$this->title_field = "item_name";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
@@ -34,41 +35,39 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "delivery_notes";
+			$this->table = "stock";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Purchase Order","name"=>"purchase_order"];
-			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
-			$this->col[] = ["label"=>"Supplier Delivery Note","name"=>"supplier_delivery_note"];
-			$this->col[] = ["label"=>"Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Item Code","name"=>"item_code"];
+			$this->col[] = ["label"=>"Item Name","name"=>"item_name"];
+			$this->col[] = ["label"=>"Qty","name"=>"qty"];
+			$this->col[] = ["label"=>"Wip Qty","name"=>"wip_qty"];
+			$this->col[] = ["label"=>"Finish Good Qty","name"=>"finish_good_qty"];
+			$this->col[] = ["label"=>"Not Good Qty","name"=>"not_good_qty"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			
-			$this->form[] = ['label'=>'po','name'=>'purchase_order','type'=>'hidden'];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
-			
-			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			
-			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
+			$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'hidden','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9','readonly'=>'true'];
+			$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'money','width'=>'col-sm-9','decimals'=>'0'];
+			$this->form[] = ['label'=>'Wip Qty','name'=>'wip_qty','type'=>'money','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Finish Good Qty','name'=>'finish_good_qty','type'=>'money','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Not Good Qty','name'=>'not_good_qty','type'=>'money','width'=>'col-sm-9'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Items','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
+			//$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'hidden'];
+			//$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			//$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9','readonly'=>'true'];
+			//$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'money','width'=>'col-sm-9','decimals'=>'0'];
+			//$this->form[] = ['label'=>'Wip Qty','name'=>'wip_qty','type'=>'money','width'=>'col-sm-9'];
+			//$this->form[] = ['label'=>'Finish Good Qty','name'=>'finish_good_qty','type'=>'money','width'=>'col-sm-9'];
+			//$this->form[] = ['label'=>'Not Good Qty','name'=>'not_good_qty','type'=>'money','width'=>'col-sm-9'];
 			# OLD END FORM
 
 			/* 
@@ -167,9 +166,10 @@
 	        | javascript code in the variable 
 	        | $this->script_js = "function() { ... }";
 	        |
-			*/
-			// pr($_GET);
-	        $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
+	        */
+			// $this->script_js = NULL;
+			$this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
+
 
 
             /*
@@ -205,7 +205,8 @@
 	        |
 	        */
 	        $this->load_js = array();	        
-	        $this->load_js[] = asset("js/delivery-note.js");
+	        $this->load_js[] = asset("js/stock.js");
+	        
 	        
 	        
 	        /*
@@ -279,7 +280,7 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-			// pr($_POST,1);
+
 	    }
 
 	    /* 
@@ -291,9 +292,7 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
-			\DB::table('delivery_note_items')
-			->where('delivery_note_id',null)
-			->update(['delivery_note_id'=>$id]);
+
 	    }
 
 	    /* 
@@ -345,17 +344,16 @@
 
 	    }
 
-
-		public function getDeliverynote($id){
+		public function getItembdk($id){
 			$order_by 		= 'name desc'; //default
 			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
 
 			$filters = json_encode($filters);
 			// pr($order_by);
-			$doctype 		= 'Delivery Note';
+			$doctype 		= 'Item';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:10;
-			$fields 		= "name, customer, posting_date, posting_time";
+			$fields 		= "item_code, item_name";
 			
 			
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
@@ -372,12 +370,11 @@
 			]);
 			$data = json_decode($res->getBody()->getContents());
 
-
 			$response = $data->message->data;
 			if($response){
 				foreach($response as $key => $val){
-					$response[$key]->id = $val->name;
-					$response[$key]->text = $val->name;
+					$response[$key]->id = $val->item_code;
+					$response[$key]->text = $val->item_code.' | '.$val->item_name;
 				}
 			}
 			if(request()->ajax()){
@@ -387,24 +384,6 @@
 			return $response;			
 		}
 
-		function getDeliverynotedetail($id){			
-			$doctype 		= 'Delivery Note';
-			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_data_detail';
-			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res 	= $client->request('GET', $this->_host.$_url, [
-				'query' => [
-					'doctype' => $doctype,
-					'id' => $_GET['idx']
-					]
-			]);
-			$data = json_decode($res->getBody()->getContents());
-			$response = @$data->message;			
-			if(request()->ajax()){
-				$response =  response()->json($response);
-			}
-			// $response =  response()->json($response);
-			return $response;	
-		}
 	    //By the way, you can still create your own method in here... :) 
 
 
