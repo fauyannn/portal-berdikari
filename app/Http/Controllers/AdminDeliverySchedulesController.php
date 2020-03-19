@@ -4,9 +4,8 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-	// use Guzzle;
 
-	class AdminPurchaseOrderController extends \crocodicstudio\crudbooster\controllers\CBController {
+	class AdminDeliverySchedulesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 		private $_datas = [];
 		private $_host;
@@ -22,7 +21,7 @@
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "id";
+			$this->title_field = "item_name";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
@@ -32,32 +31,49 @@
 			$this->button_add = false;
 			$this->button_edit = false;
 			$this->button_delete = false;
-			$this->button_detail = true;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "purchase_orders";
+			$this->table = "delivery_schedules";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Purchase Order Number","name"=>"purchase_order_number"];
-			$this->col[] = ["label"=>"Purchase Order Date","name"=>"purchase_order_date"];
-			$this->col[] = ["label"=>"Total Amount","name"=>"total_amount"];
+			$this->col[] = ["label"=>"Type","name"=>"type"];
+			$this->col[] = ["label"=>"Number","name"=>"number"];
+			$this->col[] = ["label"=>"Item Code","name"=>"item_code"];
+			$this->col[] = ["label"=>"Item Name","name"=>"item_name"];
+			$this->col[] = ["label"=>"Qty","name"=>"qty"];
+			$this->col[] = ["label"=>"Delivery Date","name"=>"delivery_date"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Type','name'=>'type','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Number','name'=>'number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Customer','name'=>'customer','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Customer Purchase Order','name'=>'customer_purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ["label"=>"Type","name"=>"type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Number","name"=>"number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Customer","name"=>"customer","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Customer Purchase Order","name"=>"customer_purchase_order","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Supplier","name"=>"supplier","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Item Code","name"=>"item_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Item Name","name"=>"item_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Qty","name"=>"qty","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Delivery Date","name"=>"delivery_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
 			# OLD END FORM
-
-			// pr($this,1);
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -156,7 +172,7 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-			$this->script_js = null;
+	        $this->script_js = NULL;
 
 
             /*
@@ -192,8 +208,9 @@
 	        |
 	        */
 	        $this->load_js = array();
-			$this->load_js[] = asset("js/mypo.js");
+	        $this->load_js[] = asset("js/delivery-schedule.js");
 			$this->load_js[] = asset("js/myglobal.js");
+	        
 	        
 	        
 	        /*
@@ -204,7 +221,7 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = null;
+	        $this->style_css = NULL;
 	        
 	        
 	        
@@ -244,7 +261,8 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			//Your code here			
+	        //Your code here
+	            
 	    }
 
 	    /*
@@ -254,7 +272,7 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-			//Your code here
+	    	//Your code here
 	    }
 
 	    /*
@@ -330,20 +348,25 @@
 
 	    }
 
+
+
 	    //By the way, you can still create your own method in here... :) 
 
 
 		public function getQuery($id){
 			// $_GET			= $_GET;
-			$this->table = "purchase_orders";
+			$this->table = "delivery_schedules";
 			// pr($_GET);
 			
-			$order_by 		= 'name desc'; //default
+			$order_by 		= 'delivery_date desc'; //default
 			$filters		= [];
 			$arrfield = [
-				$this->table.'.purchase_order_number'=>'name',
-				$this->table.'.purchase_order_date' => 'transaction_date',
-				$this->table.'.total_amount' => 'grand_total'
+				$this->table.'.type' => 'type',
+				$this->table.'.number'=>'sales_order',
+				$this->table.'.item_code' => 'item_code',
+				$this->table.'.item_name' => 'item_name',
+				$this->table.'.qty' => 'qty',
+				$this->table.'.delivery_date' => 'delivery_date',
 				];
 				
 			if($_GET['filter_column']){
@@ -362,10 +385,10 @@
 			}
 			$filters = json_encode($filters);
 			// pr($filters);
-			$doctype 		= 'Purchase Order';
+			$doctype 		= 'Delivery Schedule';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:20;
-			$fields 		= "name, transaction_date, grand_total";
+			$fields 		= "name,po_no,item_code,customer,qty,sales_order,delivery_date,item_name,type,purchase_order,supplier";
 			
 			
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
@@ -381,6 +404,7 @@
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
+			// pr($data);
 			$data->message->modul_url = CRUDBooster::mainpath('');
 			$data->message->total_rows = $page_length;
 			$data->message->get_start = $_GET['start'];
@@ -396,7 +420,7 @@
 			else {
 				$url_full = url()->full(); 
 				$url_full = str_replace('?','&',$url_full);
-				$url_full = str_replace('/purchase_orders','/purchase_orders/query/1?e='.md5(0),$url_full);
+				$url_full = str_replace('/delivery_schedules','/delivery_schedules/query/1?e='.md5(0),$url_full);
 				$data->message->url_full = $url_full;
 				// pr($_GET);
 				// pr($data);				
@@ -410,7 +434,7 @@
 			$data = $this->getQuery($_GET);
 
 			$datas = $data->message->data;
-			// pr($data->message);			
+			// pr($data->message);	
 
 			$total_rows = 'Total rows : '.$data->message->total_rows.' of '.$data->message->total_data;
 			
@@ -422,9 +446,12 @@
 					$url = CRUDBooster::mainpath('show/'.$id);
 										
 					$datalist .= "<tr>
-							<td>".$val->name."</td>
-							<td>".$val->transaction_date."</td>
-							<td class='pull-right'>Rp ".formatMoney($val->grand_total)."</td>
+							<td>".$val->type."</td>
+							<td>".($val->sales_order ?:$val->purchase_order)."</td>
+							<td>".$val->item_code."</td>
+							<td>".$val->item_name."</td>
+							<td class='pull-right'>".formatMoney($val->qty)."</td>
+							<td>".$val->delivery_date."</td>
 							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
 						</tr>";
 				}	
@@ -448,12 +475,12 @@
 
 		public function getShow($id){
 			$items = [];
-			$_url = '/api/resource/Purchase Order/'.$id;
+			$_url = '/api/resource/Delivery Schedule/'.$id;
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
 			$res = $client->request('GET', $this->_host.$_url);
 			$data = json_decode($res->getBody()->getContents());
 			$data = $data->data;
-			return view('purchase_order_detail',compact('data'));
+			return view('delivery_schedule_detail',compact('data'));
 		}
 
 	}
