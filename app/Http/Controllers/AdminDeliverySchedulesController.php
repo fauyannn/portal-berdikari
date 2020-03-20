@@ -41,12 +41,12 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Type","name"=>"type"];
-			$this->col[] = ["label"=>"Number","name"=>"number"];
-			$this->col[] = ["label"=>"Item Code","name"=>"item_code"];
-			$this->col[] = ["label"=>"Item Name","name"=>"item_name"];
-			$this->col[] = ["label"=>"Qty","name"=>"qty"];
+			// $this->col[] = ["label"=>"Type","name"=>"type"];
+			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
 			$this->col[] = ["label"=>"Delivery Date","name"=>"delivery_date"];
+			// $this->col[] = ["label"=>"Item Code","name"=>"item_code"];
+			// $this->col[] = ["label"=>"Item Name","name"=>"item_name"];
+			// $this->col[] = ["label"=>"Qty","name"=>"qty"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -383,6 +383,7 @@
 					}
 				}
 			}
+			$filters['type'] = ['=','Purchase Order'];
 			$filters = json_encode($filters);
 			// pr($filters);
 			$doctype 		= 'Delivery Schedule';
@@ -391,7 +392,7 @@
 			$fields 		= "name,po_no,item_code,customer,qty,sales_order,delivery_date,item_name,type,purchase_order,supplier";
 			
 			
-			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
 			$res 	= $client->request('GET', $this->_host.$_url, [
 				'query' => [
@@ -400,7 +401,8 @@
 					'page_length' => $page_length,
 					'fields' => $fields,
 					'order_by' => $order_by,
-					'filters' => $filters
+					'filters' => $filters,
+					'group_by'=> 'supplier, delivery_date'
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
@@ -441,16 +443,21 @@
 			$datalist = "<table id='temp' style='display:none;'>";
 			if($datas){	
 				foreach($datas as $key => $val){
-					$id = $val->name;
+					$id = $val->supplier.'__'.$val->delivery_date;
 					$return_url = '?return_url=http%3A%2F%2F127.0.0.1%3A8000%2Fadmin%2Fpurchase_order';
 					$url = CRUDBooster::mainpath('show/'.$id);
 										
+					// $datalist .= "<tr>
+					// 		<td>".$val->type."</td>
+					// 		<td>".($val->sales_order ?:$val->purchase_order)."</td>
+					// 		<td>".$val->item_code."</td>
+					// 		<td>".$val->item_name."</td>
+					// 		<td class='pull-right'>".formatMoney($val->qty)."</td>
+					// 		<td>".$val->delivery_date."</td>
+					// 		<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
+					// 	</tr>";
 					$datalist .= "<tr>
-							<td>".$val->type."</td>
-							<td>".($val->sales_order ?:$val->purchase_order)."</td>
-							<td>".$val->item_code."</td>
-							<td>".$val->item_name."</td>
-							<td class='pull-right'>".formatMoney($val->qty)."</td>
+							<td>".$val->supplier."</td>
 							<td>".$val->delivery_date."</td>
 							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
 						</tr>";
@@ -474,12 +481,48 @@
 		}
 
 		public function getShow($id){
-			$items = [];
-			$_url = '/api/resource/Delivery Schedule/'.$id;
+			$doctype 		= 'Delivery Schedule';
+			$start 			= 0;
+			$page_length 	= 500;
+			$order_by       = 'modified desc';
+			$fields 		= "purchase_order,item_code,item_name,qty";
+			$fields 		= "*";
+			
+			$param 			= explode('__',$id);
+			$supplier		= @$param[0];
+			$delivery_date	= @$param[1];
+
+
+			$filters['supplier'] = ['=',$supplier];
+			$filters['delivery_date'] = ['=',$delivery_date];
+			$filters = json_encode($filters);
+
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res = $client->request('GET', $this->_host.$_url);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters
+					]
+			]);
+			
+			
+			
+			// $_url = '/api/resource/Delivery Schedule/'.$id;
+			// $client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			// $res = $client->request('GET', $this->_host.$_url);
+
 			$data = json_decode($res->getBody()->getContents());
-			$data = $data->data;
+			$data->message->supplier = $supplier;
+			$data->message->delivery_date = $delivery_date;
+			// $data['message']['data']['supplier'] = $supplier;
+			// $data['message']['data']['delivery_date'] = $delivery_date;
+			$data = $data->message;
+			// pr($data);
 			return view('delivery_schedule_detail',compact('data'));
 		}
 

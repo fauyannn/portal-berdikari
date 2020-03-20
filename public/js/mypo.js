@@ -26,7 +26,7 @@ $(document).ready(function(){
         }
         $this.text('loading...');
         $.get(_url, function(res){
-            console.log(res.message);
+            // console.log(res.message);
             var modul_url = res.message.modul_url;
             total_data = res.message.total_data;
             $.each(res.message.data,function(k,v){

@@ -11,7 +11,7 @@
 </p>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <strong><i class="fa fa-star"></i> Purchase Order Detail</strong>
+        <strong><i class="fa fa-calendar"></i> Delivery Schedule Detail</strong>
     </div>
     <div class="panel-body" style="padding:20px 0px 0px 0px">
         <div class="box-body" id="parent-form-area">
@@ -19,38 +19,56 @@
                 <table id="table-detail" class="table table-striped">
                     <tbody>
                         <tr>
-                            <td>Type</td>
-                            <td>{{ $data->type }}</td>
-                        </tr>
-                        <tr>
-                            <td>Number</td>
-                            <td>{{ ($data->sales_order ?:$data->purchase_order) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Customer</td>
-                            <td>{{ $data->customer }}</td>
-                        </tr>
-                        <tr>
-                            <td>Customer's Purchase Order</td>
-                            <td>{{ $data->po_no }}</td>
-                        </tr>
-                        <tr>
-                            <td>Item Code</td>
-                            <td>{{ $data->item_code }}</td>
-                        </tr>
-                        <tr>
-                            <td>Item Name</td>
-                            <td>{{ $data->name }}</td>
-                        </tr>
-                        <tr>
-                            <td>Quantity</td>
-                            <td>{{ formatMoney($data->qty) }}</td>
+                            <td>Supplier</td>
+                            <td>{{ $data->supplier }}</td>
                         </tr>
                         <tr>
                             <td>Delivery Date</td>
                             <td>{{ $data->delivery_date }}</td>
                         </tr>
-                       
+                        <tr class="">
+                            <td colspan="2">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <i class="fa fa-bars"></i> Items
+                                    </div>
+                                    <div class="panel-body">
+                                        <table id="table-detail" class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Purchase Order</th>
+                                                    <th>Item Code</th>
+                                                    <th>Item Name</th>
+                                                    <th>QTY</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if($data->data)
+                                                    @foreach($data->data as $key => $val)
+                                                        <tr>
+                                                        <td class="">
+                                                                <span class="td-label">{{ $val->purchase_order }}</span>
+                                                            </td>
+                                                            <td class="">
+                                                                <span class="td-label">{{ $val->item_code }}</span>
+                                                            </td>
+                                                            <td class="">
+                                                                <span class="td-label">{{ $val->item_name }}</span>
+                                                            </td>
+                                                            <td class="">
+                                                                <span class="td-label right">{{ formatMoney($val->qty) }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>   

@@ -26,19 +26,24 @@ $(document).ready(function(){
         }
         $this.text('loading...');
         $.get(_url, function(res){
-            console.log(res.message);
+            // console.log(res.message);
             var modul_url = res.message.modul_url;
             total_data = res.message.total_data;
             $.each(res.message.data,function(k,v){
                 var id = v.name;
                 var _url = modul_url+'/show/'+id;
                           
+                // datalist += "<tr>"+
+                //         "<td>"+v.type+"</td>"+
+                //         "<td>"+(v.sales_order ? v.sales_order : v.purchase_order)+"</td>"+
+                //         "<td>"+v.item_code+"</td>"+
+                //         "<td>"+v.item_name+"</td>"+
+                //         "<td class='pull-right'>"+formatMoney(v.qty,0,',','.')+"</td>"+
+                //         "<td>"+v.delivery_date+"</td>"+
+                //         "<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
+                //         "</tr>";
                 datalist += "<tr>"+
-                        "<td>"+v.type+"</td>"+
-                        "<td>"+(v.sales_order ? v.sales_order : v.purchase_order)+"</td>"+
-                        "<td>"+v.item_code+"</td>"+
-                        "<td>"+v.item_name+"</td>"+
-                        "<td class='pull-right'>"+formatMoney(v.qty,0,',','.')+"</td>"+
+                        "<td>"+v.supplier+"</td>"+
                         "<td>"+v.delivery_date+"</td>"+
                         "<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
                         "</tr>";
