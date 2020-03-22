@@ -1,7 +1,8 @@
+
+var _po = '';
+var db_items = [];
 $(document).ready(function(){
-
-    var _po = '';
-
+    $('table#table-detail tr:eq(2)').remove();
     $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
@@ -70,7 +71,7 @@ $(document).ready(function(){
             var $this = $(this);
             var supplier = $this.val();
             var delivery_date = $('input#delivery_date').val();
-            console.log(supplier+' '+delivery_date);
+            // console.log(supplier+' '+delivery_date);
             getPO(supplier, delivery_date)
 
         })
@@ -86,10 +87,19 @@ $(document).ready(function(){
 
     })
 
-    var supplier = $('input#supplier').val();
-    var delivery_date = $('input#delivery_date').val();
-    // console.log(supplier+' '+delivery_date);
-    getPO(supplier, delivery_date)
+    if($('input#supplier').length && $('input#delivery_date').length){
+        var supplier = $('input#supplier').val();
+        var delivery_date = $('input#delivery_date').val();
+        // console.log(supplier+' '+delivery_date);
+
+        var i=0;
+        $('table#table-items tbody tr').each(function(k,elm){
+            db_items[i] = $(elm).find('td.item_code input').val();
+            i++;
+        });
+        // console.log(db_items)
+        getPO(supplier, delivery_date)
+    }    
 
 
     $(document).on('click','input.pilih',function(){
@@ -129,7 +139,6 @@ function getItemByPO(po){
         return false;
     }
     
-
     var _table = '<div class="col-sm-2"></div><div class="col-sm-9"><table id="table-items-po" class="table table-striped table-bordered">'+
                     '<thead>'+
                         '<tr>'+
@@ -154,12 +163,13 @@ function getItemByPO(po){
     
     $.get(_url, function(res){
         data = res;
-        console.log(data);
+        // console.log(data);
         var _tr = '';
         $.each(data, function(k,v){
+            var _checked = ($.inArray(v.item_code, db_items) != -1) ? 'checked' : '';
             _tr += '<tr>'+
             '<td class="pilih">'+
-                '<input type="checkbox" class="pilih"></input>'+
+                '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
             '</td>'+
             '<td class="item_code">'+
                 '<span class="td-label">'+v.item_code+'</span>'+                                  
@@ -206,21 +216,6 @@ function getPO(supplier, delivery_date){
             };    
             var newOption = new Option(d.text, d.id, false, false);
             $('#purchase_order').append(newOption).trigger('change');
-        })
-        
-
-
-        // insert items
-        // $('table#table-items tbody').html('') //clear data childs
-        // $.each(data.items,function(k,v){
-        //     $('input#itemsitem_code').val(v.item_code)
-        //     $('input#itemsitem_name').val(v.item_name)
-        //     $('input#itemsqty').val(v.actual_qty)
-        //     $('input#itemsuom').val(v.uom)
-        //     $('input#itemsrate').val(v.rate)
-        //     $('input#itemsamount').val(v.amount)
-        //     $('input#btn-add-table-items').click()
-        // })
-
+        });
     });
 }
