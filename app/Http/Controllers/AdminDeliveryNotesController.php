@@ -174,7 +174,7 @@
 	        |
 			*/
 			// pr($_GET);
-			$this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'");';
+			// $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'");';
 			if($_GET['supplier']){
 				$this->script_js .= '$("input[name=\"supplier\"]").val("'.$_GET['supplier'].'");';
 			}

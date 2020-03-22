@@ -82,7 +82,7 @@ $(document).ready(function(){
     $('select#purchase_order').on('change',function(){
         var $this = $(this);
         _po = $this.val();
-        console.log(_po);
+        // console.log(_po);
         getItemByPO(_po)
 
     })
@@ -135,7 +135,9 @@ function getItemByPO(po){
     var _url = '/admin/purchase_orders/show/'+po;
     var data = [];
     
+    $('#table-items-po').show();
     if(!po){
+        $('#table-items-po').hide();
         return false;
     }
     
