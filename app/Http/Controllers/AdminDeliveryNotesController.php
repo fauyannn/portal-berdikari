@@ -39,26 +39,31 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Purchase Order","name"=>"purchase_order"];
 			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
-			$this->col[] = ["label"=>"Supplier Delivery Note","name"=>"supplier_delivery_note"];
-			$this->col[] = ["label"=>"Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Purchase Order","name"=>"purchase_order"];
+			// $this->col[] = ["label"=>"Supplier Delivery Note","name"=>"supplier_delivery_note"];
+			$this->col[] = ["label"=>"Created at","name"=>"created_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			
-			$this->form[] = ['label'=>'po','name'=>'purchase_order','type'=>'hidden'];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'text','readonly'=>true];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
+			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
+			// $this->form[] = ['label'=>'Select items','name'=>'item_po','type'=>'hidden','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
 			
+			$columns[] 		= ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			
 			
 			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
 			# END FORM DO NOT REMOVE THIS LINE
@@ -169,7 +174,13 @@
 	        |
 			*/
 			// pr($_GET);
-	        $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
+			$this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'");';
+			if($_GET['supplier']){
+				$this->script_js .= '$("input[name=\"supplier\"]").val("'.$_GET['supplier'].'");';
+			}
+			if($_GET['delivery_date']){
+				$this->script_js .= '$("input[name=\"delivery_date\"]").val("'.$_GET['delivery_date'].'");';
+			}		
 
 
             /*
@@ -346,16 +357,16 @@
 	    }
 
 
-		public function getDeliverynote($id){
+		public function getSupplier($id){
 			$order_by 		= 'name desc'; //default
 			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
 
 			$filters = json_encode($filters);
 			// pr($order_by);
-			$doctype 		= 'Delivery Note';
+			$doctype 		= 'Supplier';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:10;
-			$fields 		= "name, customer, posting_date, posting_time";
+			$fields 		= "name, supplier_name";
 			
 			
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
@@ -377,7 +388,7 @@
 			if($response){
 				foreach($response as $key => $val){
 					$response[$key]->id = $val->name;
-					$response[$key]->text = $val->name;
+					$response[$key]->text = $val->supplier_name;
 				}
 			}
 			if(request()->ajax()){
@@ -404,6 +415,44 @@
 			}
 			// $response =  response()->json($response);
 			return $response;	
+		}
+
+		public function getPurchaseorder($id){
+			$doctype 		= 'Delivery Schedule';
+			$start 			= 0;
+			$page_length 	= 500;
+			$order_by       = 'purchase_order desc';
+			$fields 		= "purchase_order";
+			
+			$param 			= explode('__',$id);
+			$supplier		= @$param[0];
+			$delivery_date	= @$param[1];
+
+
+			$filters['supplier'] = ['=',$supplier];
+			$filters['delivery_date'] = ['=',$delivery_date];
+			$filters = json_encode($filters);
+
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters,
+					// 'group_by' => 'purchase_order'
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			// pr($data);
+			$response = @$data->message;			
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+			return $response;
 		}
 	    //By the way, you can still create your own method in here... :) 
 

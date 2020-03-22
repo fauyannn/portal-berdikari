@@ -30,7 +30,8 @@ $(document).ready(function(){
             var modul_url = res.message.modul_url;
             total_data = res.message.total_data;
             $.each(res.message.data,function(k,v){
-                var id = v.name;
+                var id = v.supplier+'__'+v.delivery_date;
+                var _url_cdn = modul_url+'/../delivery_notes/add?supplier='+v.supplier+'&delivery_date='+v.delivery_date;
                 var _url = modul_url+'/show/'+id;
                           
                 // datalist += "<tr>"+
@@ -45,7 +46,8 @@ $(document).ready(function(){
                 datalist += "<tr>"+
                         "<td>"+v.supplier+"</td>"+
                         "<td>"+v.delivery_date+"</td>"+
-                        "<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
+                        "<td><a class='btn btn-xs btn-success btn-detail' title='Detail Data' href='"+_url_cdn+"'><i class='fa fa-xxx'></i> Create Delivery Note</a> "+
+                        "<a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
                         "</tr>";
             })
             $('table#table_dashboard tbody').append(datalist);

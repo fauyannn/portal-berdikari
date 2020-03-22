@@ -453,6 +453,9 @@
 			$res = $client->request('GET', $this->_host.$_url);
 			$data = json_decode($res->getBody()->getContents());
 			$data = $data->data;
+			if(request()->ajax()){
+				return response()->json($data->items);
+			}
 			return view('purchase_order_detail',compact('data'));
 		}
 

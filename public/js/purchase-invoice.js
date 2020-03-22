@@ -31,7 +31,7 @@ $(document).ready(function(){
                 text: '** Please select a Purchase Invoice'
             },
             allowClear: true,
-            minimumInputLength: 2,
+            minimumInputLength: 1,
             ajax: {
                 url: _url,
                 delay: 250,
@@ -70,7 +70,7 @@ $(document).ready(function(){
                 text: '** Please select a Purchase Order Number'
             },
             allowClear: true,
-            minimumInputLength: 2,
+            minimumInputLength: 1,
             ajax: {
                 url: _url,
                 delay: 250,

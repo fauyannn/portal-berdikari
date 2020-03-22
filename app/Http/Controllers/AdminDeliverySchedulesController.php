@@ -55,7 +55,7 @@
 			$this->form[] = ['label'=>'Number','name'=>'number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Customer','name'=>'customer','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Customer Purchase Order','name'=>'customer_purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','dataenum'=>'sup 1;sup 2;sup 3;sup 4'];
 			$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
@@ -64,15 +64,15 @@
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Type","name"=>"type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Number","name"=>"number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Customer","name"=>"customer","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Customer Purchase Order","name"=>"customer_purchase_order","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Supplier","name"=>"supplier","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Item Code","name"=>"item_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Item Name","name"=>"item_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Qty","name"=>"qty","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Delivery Date","name"=>"delivery_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
+			//$this->form[] = ['label'=>'Type','name'=>'type','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Number','name'=>'number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Customer','name'=>'customer','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Customer Purchase Order','name'=>'customer_purchase_order','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
 			# OLD END FORM
 
 			/* 
@@ -101,7 +101,8 @@
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
 	        | 
 	        */
-	        $this->addaction = array();
+			$this->addaction = array();
+			// $this->addaction[] = ['label'=>'Create Delivery Note','url'=>CRUDBooster::mainpath('show/[id]'),'icon'=>'fa fa-eye','color'=>'warning'];
 
 
 	        /* 
@@ -444,8 +445,8 @@
 			if($datas){	
 				foreach($datas as $key => $val){
 					$id = $val->supplier.'__'.$val->delivery_date;
-					$return_url = '?return_url=http%3A%2F%2F127.0.0.1%3A8000%2Fadmin%2Fpurchase_order';
-					$url = CRUDBooster::mainpath('show/'.$id);
+					$url_cdn = CRUDBooster::mainpath('../delivery_notes/add?supplier='.$val->supplier.'&delivery_date='.$val->delivery_date);
+					$url     = CRUDBooster::mainpath('show/'.$id);
 										
 					// $datalist .= "<tr>
 					// 		<td>".$val->type."</td>
@@ -459,7 +460,10 @@
 					$datalist .= "<tr>
 							<td>".$val->supplier."</td>
 							<td>".$val->delivery_date."</td>
-							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
+							<td>
+							<a class='btn btn-xs btn-success btn-detail' title='Detail Data' href='".$url_cdn."'><i class='fa fa-xx'></i> Create Delivery Note</a>
+								<a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a>
+							</td>
 						</tr>";
 				}	
 			}
@@ -486,7 +490,7 @@
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
 			$fields 		= "purchase_order,item_code,item_name,qty";
-			$fields 		= "*";
+			// $fields 		= "*";
 			
 			$param 			= explode('__',$id);
 			$supplier		= @$param[0];

@@ -1,4 +1,8 @@
 $(document).ready(function(){
+
+    var _po = '';
+
+    $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
         $('div.child-form-area').parent().css('display','block');
@@ -21,16 +25,16 @@ $(document).ready(function(){
     })
 
 
-    if ( $( "select#purchase_order").length ) {
-        $('select#purchase_order').attr('id','my_purchase_order');
-        var _url = '/admin/delivery_notes/deliverynote/1?e=cfcd208495d565ef66e7dff9f98764da';
-        $('#my_purchase_order').select2({
+    if ( $( "select#supplier").length ) {
+        $('select#supplier').attr('id','my_supplier');
+        var _url = '/admin/delivery_notes/supplier/1?e=cfcd208495d565ef66e7dff9f98764da';
+        $('#my_supplier').select2({
             placeholder: {
                 id: '-1',
-                text: '** Please select a Delivery Note'
+                text: '** Please select a Supplier'
             },
             allowClear: true,
-            minimumInputLength: 2,
+            minimumInputLength: 1,
             ajax: {
                 url: _url,
                 delay: 250,
@@ -53,41 +57,170 @@ $(document).ready(function(){
         });
         
 
-        var _val = $('input[name="purchase_order"]').val();
+        var _val = $('input[name="supplier"]').val();
         var data = {
             id: _val,
             text: _val
         };    
         var newOption = new Option(data.text, data.id, false, false);
-        $('#my_purchase_order').append(newOption).trigger('change');
+        $('#my_supplier').append(newOption).trigger('change');
 
 
-        $('#my_purchase_order').on('change',function(){
+        $('#my_supplier').on('change',function(){
             var $this = $(this);
-            var val = $this.val();
-            console.log(val);
-            var _url = '/admin/delivery_notes/deliverynotedetail/1?idx='+val;
-            var data = [];
-            $.get(_url, function(res){
-                data = res.data;
-                console.log(data);
-                $('input#supplier').val(data.customer)
-                // insert items
-                $('table#table-items tbody').html('') //clear data childs
-                $.each(data.items,function(k,v){
-                    $('input#itemsitem_code').val(v.item_code)
-                    $('input#itemsitem_name').val(v.item_name)
-                    $('input#itemsqty').val(v.actual_qty)
-                    $('input#itemsuom').val(v.uom)
-                    $('input#itemsrate').val(v.rate)
-                    $('input#itemsamount').val(v.amount)
-                    $('input#btn-add-table-items').click()
-                })
-
-            });
+            var supplier = $this.val();
+            var delivery_date = $('input#delivery_date').val();
+            console.log(supplier+' '+delivery_date);
+            getPO(supplier, delivery_date)
 
         })
+        
 
     }
+
+    $('select#purchase_order').on('change',function(){
+        var $this = $(this);
+        _po = $this.val();
+        console.log(_po);
+        getItemByPO(_po)
+
+    })
+
+    var supplier = $('input#supplier').val();
+    var delivery_date = $('input#delivery_date').val();
+    // console.log(supplier+' '+delivery_date);
+    getPO(supplier, delivery_date)
+
+
+    $(document).on('click','input.pilih',function(){
+        var $this = $(this);
+        var item_code   = $this.closest('tr').find('td.item_code').text();
+        var item_name   = $this.closest('tr').find('td.item_name').text();
+        var qty         = $this.closest('tr').find('td.qty').text();
+        var uom         = $this.closest('tr').find('td.uom').text();
+        var rate        = $this.closest('tr').find('td.rate').text();
+        var amount      = $this.closest('tr').find('td.amount').text();
+        // console.log(_po)
+        if($this.is(':checked')) {
+            $('#panel-form-items').find('#itemspurchase_order').val(_po);
+            $('#panel-form-items').find('#itemsitem_code').val(item_code);
+            $('#panel-form-items').find('#itemsitem_name').val(item_name);
+            $('#panel-form-items').find('#itemsqty').val(qty);
+            $('#panel-form-items').find('#itemsuom').val(uom);
+            $('#panel-form-items').find('#itemsrate').val(rate);
+            $('#panel-form-items').find('#itemsamount').val(amount);
+            addToTableitems();
+        } else {
+            $('table#table-items')
+                .find('td.item_code')
+                .find('input[value="'+item_code+'"]')
+                .closest('tr')
+                .remove();
+        }
+        
+    })
 });
 
+function getItemByPO(po){
+    var _url = '/admin/purchase_orders/show/'+po;
+    var data = [];
+    
+    if(!po){
+        return false;
+    }
+    
+
+    var _table = '<div class="col-sm-2"></div><div class="col-sm-9"><table id="table-items-po" class="table table-striped table-bordered">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th></th>'+
+                            '<th>Item Code</th>'+
+                            '<th>Item Name</th>'+
+                            '<th>QTY</th>'+
+                            '<th>UOM</th>'+
+                            '<th>Rate</th>'+
+                            '<th>Amount</th>'+
+                        '</tr>'+
+                    '</thead>'+
+                    '<tbody><tr><td colspan="7"><center>loading...</center></td></tr>'+
+                    
+                    '</tbody>'+
+                '</table></div>';
+
+    
+    if(!$('#table-items-po').length){
+        $('#form-group-purchase_order').append(_table);
+    }
+    
+    $.get(_url, function(res){
+        data = res;
+        console.log(data);
+        var _tr = '';
+        $.each(data, function(k,v){
+            _tr += '<tr>'+
+            '<td class="pilih">'+
+                '<input type="checkbox" class="pilih"></input>'+
+            '</td>'+
+            '<td class="item_code">'+
+                '<span class="td-label">'+v.item_code+'</span>'+                                  
+            '</td>'+
+            '<td class="item_name">'+
+                '<span class="td-label">'+v.item_name+'</span>'+                                     
+            '</td>'+
+            '<td class="qty">'+
+                '<span class="td-label">'+v.qty+'</span>'+
+            '</td>'+
+            '<td class="uom">'+
+                '<span class="td-label">'+v.uom+'</span>'+
+            '</td>'+
+            '<td class="rate">'+
+                '<span class="td-label">'+v.rate+'</span>'+
+            '</td>'+
+            '<td class="amount">'+
+                '<span class="td-label">'+v.amount+'</span>'+
+            '</td>'+
+        '</tr>';
+        });
+        // console.log(_tr)
+        $('body').find('#table-items-po').find('tbody').html(_tr);
+    });
+}
+
+
+function getPO(supplier, delivery_date){
+    var _url = '/admin/delivery_notes/purchaseorder/'+supplier+'__'+delivery_date;
+    var data = [];
+    var d = {
+        id: '',
+        text: '*** Select a Purchase Order'
+    };    
+    var newOption = new Option(d.text, d.id, false, false);
+    $('#purchase_order').append(newOption).trigger('change');
+    $.get(_url, function(res){
+        data = res.data;
+        // console.log(data);
+        $.each(data, function(k,v){
+            var d = {
+                id: v.purchase_order,
+                text: v.purchase_order
+            };    
+            var newOption = new Option(d.text, d.id, false, false);
+            $('#purchase_order').append(newOption).trigger('change');
+        })
+        
+
+
+        // insert items
+        // $('table#table-items tbody').html('') //clear data childs
+        // $.each(data.items,function(k,v){
+        //     $('input#itemsitem_code').val(v.item_code)
+        //     $('input#itemsitem_name').val(v.item_name)
+        //     $('input#itemsqty').val(v.actual_qty)
+        //     $('input#itemsuom').val(v.uom)
+        //     $('input#itemsrate').val(v.rate)
+        //     $('input#itemsamount').val(v.amount)
+        //     $('input#btn-add-table-items').click()
+        // })
+
+    });
+}
