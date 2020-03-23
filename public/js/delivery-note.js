@@ -2,7 +2,7 @@
 var _po = '';
 var db_items = [];
 $(document).ready(function(){
-    $('table#table-detail tr:eq(2)').remove();
+    // $('table#table-detail tr:eq(2)').remove();
     $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
@@ -72,7 +72,7 @@ $(document).ready(function(){
             var supplier = $this.val();
             var delivery_date = $('input#delivery_date').val();
             // console.log(supplier+' '+delivery_date);
-            getPO(supplier, delivery_date)
+            getPO(supplier, delivery_date, false)
 
         })
         
@@ -98,7 +98,7 @@ $(document).ready(function(){
             i++;
         });
         // console.log(db_items)
-        getPO(supplier, delivery_date)
+        getPO(supplier, delivery_date, true)
     }    
 
 
@@ -199,8 +199,8 @@ function getItemByPO(po){
 }
 
 
-function getPO(supplier, delivery_date){
-    var _url = '/admin/delivery_notes/purchaseorder/'+supplier+'__'+delivery_date;
+function getPO(supplier, delivery_date, _auto){
+    var _url = '/admin/delivery_notes/purchaseorder/'+supplier+'__'+delivery_date+'?item=1';
     var data = [];
     var d = {
         id: '',
@@ -210,7 +210,7 @@ function getPO(supplier, delivery_date){
     $('#purchase_order').append(newOption).trigger('change');
     $.get(_url, function(res){
         data = res.data;
-        // console.log(data);
+        console.log(data);
         $.each(data, function(k,v){
             var d = {
                 id: v.purchase_order,
@@ -218,6 +218,20 @@ function getPO(supplier, delivery_date){
             };    
             var newOption = new Option(d.text, d.id, false, false);
             $('#purchase_order').append(newOption).trigger('change');
+
+            if(_auto){
+                var rate = parseInt(v.last_purchase_rate);
+                var amount = rate * v.qty;
+                $('#panel-form-items').find('#itemspurchase_order').val(v.purchase_order);
+                $('#panel-form-items').find('#itemsitem_code').val(v.item_code);
+                $('#panel-form-items').find('#itemsitem_name').val(v.item_name);
+                $('#panel-form-items').find('#itemsqty').val(v.qty);
+                $('#panel-form-items').find('#itemsuom').val(v.stock_uom);
+                $('#panel-form-items').find('#itemsrate').val(rate);
+                $('#panel-form-items').find('#itemsamount').val(amount);
+                addToTableitems();
+            }
+
         });
     });
 }

@@ -40,7 +40,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
-			$this->col[] = ["label"=>"Purchase Order","name"=>"purchase_order"];
+			$this->col[] = ["label"=>"Delivery Date","name"=>"delivery_date"];
 			// $this->col[] = ["label"=>"Supplier Delivery Note","name"=>"supplier_delivery_note"];
 			$this->col[] = ["label"=>"Created at","name"=>"created_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
@@ -52,7 +52,7 @@
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
+			// $this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
 			// $this->form[] = ['label'=>'Select items','name'=>'item_po','type'=>'hidden','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
 			
@@ -422,12 +422,11 @@
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'purchase_order desc';
-			$fields 		= "purchase_order";
+			$fields 		= "purchase_order,item_code, item_name, qty,stock_uom,last_purchase_rate";
 			
 			$param 			= explode('__',$id);
 			$supplier		= @$param[0];
 			$delivery_date	= @$param[1];
-
 
 			$filters['supplier'] = ['=',$supplier];
 			$filters['delivery_date'] = ['=',$delivery_date];
@@ -447,12 +446,73 @@
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
-			// pr($data);
+			// $datas = [];
+			// if(@count($data->message->data)){
+			// 	foreach($data->message->data as $k => $val){
+			// 		$datas[$val->item_code] = $val;
+			// 	}
+			// }
+			// pr($datas);
+
+
+			// if($_GET['item'] == 1){
+			// 	$item_codes = [];
+			// 	$_datas = $data->message->data;
+			// 	if($_datas){
+			// 		foreach($_datas as $k => $val){
+			// 			$item_codes[] = $val->item_code;
+			// 		}
+			// 	}
+			// 	$items = $this->getItems($item_codes);
+			// 	// pr($items);
+			// 	if(@count($items->message->data)){
+			// 		foreach($items->message->data as $k => $val){
+			// 			$datas[$val->item_code]->uom = $val->stock_uom;
+			// 			$datas[$val->item_code]->rate = $val->last_purchase_rate;
+			// 			$datas[$val->item_code]->amount = $val->last_purchase_rate * $datas[$val->item_code]->qty;
+			// 		}
+			// 	}
+			// }
+
+			// pr($datas);/.
 			$response = @$data->message;			
 			if(request()->ajax()){
 				$response =  response()->json($response);
 			}
 			return $response;
+		}
+
+
+		public function getItems($item_codes){
+			$doctype 		= 'Item';
+			$start 			= 0;
+			$page_length 	= 1000;
+			$order_by       = 'item_code desc';
+			$fields 		= "item_code,stock_uom,last_purchase_rate";
+			
+			$param 			= explode('__',$id);
+			$supplier		= @$param[0];
+			$delivery_date	= @$param[1];
+
+			$filters['item_code'] = ['IN',implode(',',$item_codes)];
+			$filters = json_encode($filters);
+			
+// pr($filters);
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters,
+					// 'group_by' => 'purchase_order'
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			return $data;
 		}
 	    //By the way, you can still create your own method in here... :) 
 
