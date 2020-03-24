@@ -133,7 +133,7 @@ $(document).ready(function(){
             setDBItems();
         } else {
             $('table#table-items')
-                .find('tr#'+_po+'__'+item_code)
+                .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
                 .remove();
         }
         
@@ -263,9 +263,10 @@ function setDBItems(){
     $('table#table-items tbody tr').each(function(k,elm){
         var po = $(elm).find('td.purchase_order input').val();
         var item_code = $(elm).find('td.item_code input').val();
-        db_items[i] = po+'__'+item_code;
+        var _id = (po+'__'+item_code).trim().replace(/[_\W]+/g, "-");
+        db_items[i] = _id;
 
-        $(elm).attr('id',po+'__'+item_code);
+        $(elm).attr('id',_id);
 
         // console.log(elm);
         i++;
