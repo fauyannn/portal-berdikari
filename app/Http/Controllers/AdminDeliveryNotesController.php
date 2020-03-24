@@ -63,6 +63,8 @@
 			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Batch No','name'=>'batch_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			
 			
 			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];

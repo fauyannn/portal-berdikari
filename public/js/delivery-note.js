@@ -94,7 +94,12 @@ $(document).ready(function(){
         var delivery_date = $('input#delivery_date').val();
         // console.log(supplier+' '+delivery_date);
        
-        getPO(supplier, delivery_date, true)
+        var auto_input = false;
+        if($('input[value="Save & Add More"]').length){
+            auto_input = true;
+        }
+
+        getPO(supplier, delivery_date, auto_input)
     }    
 
 
