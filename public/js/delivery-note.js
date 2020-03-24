@@ -127,8 +127,8 @@ $(document).ready(function(){
             $('#panel-form-items').find('#itemsitem_name').val(item_name);
             $('#panel-form-items').find('#itemsqty').val(qty);
             $('#panel-form-items').find('#itemsuom').val(uom);
-            // $('#panel-form-items').find('#itemsrate').val(rate);
-            // $('#panel-form-items').find('#itemsamount').val(amount);
+            $('#panel-form-items').find('#itemsbatch_no').val('-');
+            $('#panel-form-items').find('#itemsserial_no').val('-');
             addToTableitems();
             setDBItems();
         } else {
@@ -149,8 +149,8 @@ function autoInputItem(items){
         $('#panel-form-items').find('#itemsitem_name').val(v.item_name);
         $('#panel-form-items').find('#itemsqty').val(v.qty);
         $('#panel-form-items').find('#itemsuom').val(v.stock_uom);
-        // $('#panel-form-items').find('#itemsrate').val(rate);
-        // $('#panel-form-items').find('#itemsamount').val(amount);
+        $('#panel-form-items').find('#itemsbatch_no').val('-');
+        $('#panel-form-items').find('#itemsserial_no').val('-');
         addToTableitems();
     });
 }

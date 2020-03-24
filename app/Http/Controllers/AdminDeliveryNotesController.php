@@ -300,7 +300,6 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-			// pr($_POST,1);
 	    }
 
 	    /* 
@@ -315,6 +314,7 @@
 			\DB::table('delivery_note_items')
 			->where('delivery_note_id',null)
 			->update(['delivery_note_id'=>$id]);
+			$this->getGenerateqr($id);
 	    }
 
 	    /* 
@@ -338,7 +338,8 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-	        //Your code here 
+			//Your code here
+			$this->getGenerateqr($id);
 
 	    }
 
@@ -563,6 +564,35 @@
 			]);
 			$data = json_decode($res->getBody()->getContents());
 			return $data;
+		}
+
+		public function getJson($id){
+			$dn = DB::table('delivery_notes')
+				->leftJoin('delivery_note_items','delivery_notes.id','=','delivery_note_id')
+				->where('delivery_notes.id',$id)
+				->get();
+
+			$datas = [];
+			if(count($dn)){
+				$datas['supplier'] 		= $dn[0]->supplier;
+				$datas['delivery_date'] 	= $dn[0]->delivery_date;
+				foreach($dn as $k => $val){
+					$datas['items'][$k] = [
+						'purchase_order'=>$val->purchase_order,
+						'item_code'=>$val->item_code,
+						'item_name'=>$val->item_name,
+						'qty'=>$val->qty,
+						'uom'=>$val->uom,
+						'batch_no'=>$val->batch_no,
+						'serial_no'=>$val->serial_no,
+					];
+				}
+			}
+			return $data = json_encode($datas);
+		}
+		public function getGenerateqr($id){
+			
+			// pr($data,1);
 		}
 	    //By the way, you can still create your own method in here... :) 
 
