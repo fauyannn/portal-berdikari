@@ -34,6 +34,7 @@ $(document).ready(function(){
                 id: '-1',
                 text: '** Please select a Supplier'
             },
+            // disabled: true,
             allowClear: true,
             minimumInputLength: 1,
             ajax: {
@@ -56,7 +57,9 @@ $(document).ready(function(){
                 return markup;
             },
         });
-        
+        if($('input[name="supplier"]').val()){
+            $("#my_supplier").select2({disabled: true});
+        }        
 
         var _val = $('input[name="supplier"]').val();
         var data = {
@@ -226,15 +229,15 @@ function getPO(supplier, delivery_date, _auto){
     var _url = '/admin/delivery_notes/porder/'+supplier+'__'+delivery_date+'?item=1';
     var data = [];
 
-    if($('select#purchase_order').find('option[value="0"]').length < 1){
+    // if($('select#purchase_order').find('option[value="0"]').length < 1){
         var d = {
             id: 0,
-            text: '*** Select a Purchase Order'
+            text: '*** Select a Purchase Orders'
         };
-    }
+        var newOption = new Option(d.text, d.id, false, false);
+        $('select#purchase_order').html(newOption).trigger('change');
+    // }
         
-    var newOption = new Option(d.text, d.id, false, false);
-    $('#purchase_order').append(newOption).trigger('change');
     $.get(_url, function(res){
         data = res.data;
         console.log(data);
@@ -244,11 +247,11 @@ function getPO(supplier, delivery_date, _auto){
                 text: v.name
             };    
             var newOption = new Option(d.text, d.id, false, false);
-            $('#purchase_order').append(newOption).trigger('change');
-
-            
+            $('select#purchase_order').append(newOption).trigger('change');            
 
         });
+        
+        
     }).done(function(){
         setDBItems();
     });

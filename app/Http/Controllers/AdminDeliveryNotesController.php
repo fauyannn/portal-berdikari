@@ -48,9 +48,9 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
-			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'date from ds','name'=>'delivery_date_from_ds','type'=>'hidden','readonly'=>true];
 			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required'];
 			
