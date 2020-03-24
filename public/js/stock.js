@@ -59,4 +59,8 @@ $(document).ready(function(){
 
         })
     }
-})
+
+    $('#scan-qr').on('click', function () {
+        $('#exampleModalCenter').modal('show');
+    })
+});

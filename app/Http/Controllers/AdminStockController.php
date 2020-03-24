@@ -133,7 +133,9 @@
 	        | @icon  = Icon from Awesome.
 	        | 
 	        */
-	        $this->index_button = array();
+	        $this->index_button = array(
+	            ['label'=>'Scan QR','url' => '#', 'icon'=>'fa fa-qrcode','color'=>'info']
+            );
 
 
 
@@ -192,7 +194,23 @@
 	        | $this->post_index_html = "<p>test</p>";
 	        |
 	        */
-	        $this->post_index_html = null;
+	        $this->post_index_html = <<< STRING
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Scan QR</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Test
+      </div>
+    </div>
+  </div>
+</div>
+STRING;
 	        
 	        
 	        

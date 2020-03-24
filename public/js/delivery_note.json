@@ -1,0 +1,13 @@
+{
+  "set_warehouse": "Stores - BME",
+  "posting_date": "2020-03-25",
+  "supplier": "CGS INDONESIA",
+  "is_subcontracted": true,
+  "supplier_warehouse": "Makloon CGS Indonesia - BME",
+  "items": [
+    {
+      "item_code": "64223-K59J-A703 ( EXT )",
+      "qty": 2100
+    }
+  ]
+}
