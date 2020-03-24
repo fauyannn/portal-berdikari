@@ -3,7 +3,7 @@ var _po = '';
 var db_items = [];
 $(document).ready(function(){
     $('table#table-detail tr:eq(2)').remove();
-    $('#btn_add_new_data').hide();
+    // $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
         $('div.child-form-area').parent().css('display','block');
@@ -70,7 +70,7 @@ $(document).ready(function(){
         $('#my_supplier').on('change',function(){
             var $this = $(this);
             var supplier = $this.val();
-            var delivery_date = $('input#delivery_date').val();
+            var delivery_date = $('input[name="delivery_date"]').val();
             // console.log(supplier+' '+delivery_date);
             getPO(supplier, delivery_date, false)
 
@@ -81,26 +81,32 @@ $(document).ready(function(){
 
     $('select#purchase_order').on('change',function(){
         var $this = $(this);
-        var delivery_date = $('#delivery_date').val();
-        var supplier = $('#supplier').val();
+        var delivery_date = $('input[name="delivery_date"]').val();
+        var supplier = $('input[name="supplier"]').val();
         _po = $this.val();
         // console.log(_po);
         getItemByPO(supplier,delivery_date,_po)
+        
 
     })
 
-    if($('input#supplier').length && $('input#delivery_date').length){
-        var supplier = $('input#supplier').val();
-        var delivery_date = $('input#delivery_date').val();
+    if($('input[name="supplier"]').length && $('input[name="delivery_date"]').length){
+        var supplier = $('input[name="supplier"]').val();
+        var delivery_date = $('input[name="delivery_date"]').val();
         // console.log(supplier+' '+delivery_date);
        
         var auto_input = false;
-        if($('input[value="Save & Add More"]').length){
-            auto_input = true;
-        }
+        // if($('input[value="Save & Add More"]').length){
+        //     auto_input = true;
+        // }
+        getPO(supplier, delivery_date, auto_input);
 
-        getPO(supplier, delivery_date, auto_input)
+        var items = $('form').data('items');
+        if(items){
+            autoInputItem(items);
+        }
     }    
+
 
 
     $(document).on('click','input.pilih',function(){
@@ -109,8 +115,8 @@ $(document).ready(function(){
         var item_name   = $this.closest('tr').find('td.item_name').text();
         var qty         = $this.closest('tr').find('td.qty').text();
         var uom         = $this.closest('tr').find('td.uom').text();
-        var rate        = $this.closest('tr').find('td.rate').text();
-        var amount      = $this.closest('tr').find('td.amount').text();
+        // var rate        = $this.closest('tr').find('td.rate').text();
+        // var amount      = $this.closest('tr').find('td.amount').text();
         // console.log(_po)
         if($this.is(':checked')) {
             $('#panel-form-items').find('#itemspurchase_order').val(_po);
@@ -118,8 +124,8 @@ $(document).ready(function(){
             $('#panel-form-items').find('#itemsitem_name').val(item_name);
             $('#panel-form-items').find('#itemsqty').val(qty);
             $('#panel-form-items').find('#itemsuom').val(uom);
-            $('#panel-form-items').find('#itemsrate').val(rate);
-            $('#panel-form-items').find('#itemsamount').val(amount);
+            // $('#panel-form-items').find('#itemsrate').val(rate);
+            // $('#panel-form-items').find('#itemsamount').val(amount);
             addToTableitems();
             setDBItems();
         } else {
@@ -131,13 +137,27 @@ $(document).ready(function(){
     })
 });
 
+function autoInputItem(items){
+    $.each(items, function(k,v){
+        var rate = parseInt(v.last_purchase_rate);
+        var amount = rate * v.qty;
+        $('#panel-form-items').find('#itemspurchase_order').val(v.purchase_order);
+        $('#panel-form-items').find('#itemsitem_code').val(v.item_code);
+        $('#panel-form-items').find('#itemsitem_name').val(v.item_name);
+        $('#panel-form-items').find('#itemsqty').val(v.qty);
+        $('#panel-form-items').find('#itemsuom').val(v.stock_uom);
+        // $('#panel-form-items').find('#itemsrate').val(rate);
+        // $('#panel-form-items').find('#itemsamount').val(amount);
+        addToTableitems();
+    });
+}
 function getItemByPO(supplier,delivery_date,po){
-    var param = supplier+'__'+delivery_date+'__'+po;
-    var _url = '/admin/delivery_schedules/item/'+param;
+    // var param = supplier+'__'+delivery_date+'__'+po;
+    var _url = '/admin/purchase_orders/show/'+po;
     var data = [];
     
     $('#table-items-po').show();
-    if(!po){
+    if(po == 0){
         $('#table-items-po').hide();
         return false;
     }
@@ -150,8 +170,8 @@ function getItemByPO(supplier,delivery_date,po){
                             '<th>Item Name</th>'+
                             '<th>QTY</th>'+
                             '<th>UOM</th>'+
-                            '<th>Rate</th>'+
-                            '<th>Amount</th>'+
+                            // '<th>Rate</th>'+
+                            // '<th>Amount</th>'+
                         '</tr>'+
                     '</thead>'+
                     '<tbody><tr><td colspan="7"><center>loading...</center></td></tr>'+
@@ -169,7 +189,7 @@ function getItemByPO(supplier,delivery_date,po){
         // console.log(data);
         var _tr = '';
         $.each(data, function(k,v){
-            var _checked = ($.inArray(v.item_code, db_items) != -1) ? 'checked' : '';
+            var _checked = ($.inArray(_po+'__'+v.item_code, db_items) != -1) ? 'checked' : '';
             var _rate = parseInt(v.last_purchase_rate);
             var _amount = _rate * v.qty;
             _tr += '<tr>'+
@@ -188,12 +208,12 @@ function getItemByPO(supplier,delivery_date,po){
             '<td class="uom">'+
                 '<span class="td-label">'+v.stock_uom+'</span>'+
             '</td>'+
-            '<td class="rate">'+
-                '<span class="td-label">'+_rate+'</span>'+
-            '</td>'+
-            '<td class="amount">'+
-                '<span class="td-label">'+_amount+'</span>'+
-            '</td>'+
+            // '<td class="rate">'+
+            //     '<span class="td-label">'+_rate+'</span>'+
+            // '</td>'+
+            // '<td class="amount">'+
+            //     '<span class="td-label">'+_amount+'</span>'+
+            // '</td>'+
         '</tr>';
         });
         // console.log(_tr)
@@ -203,37 +223,30 @@ function getItemByPO(supplier,delivery_date,po){
 
 
 function getPO(supplier, delivery_date, _auto){
-    var _url = '/admin/delivery_notes/purchaseorder/'+supplier+'__'+delivery_date+'?item=1';
+    var _url = '/admin/delivery_notes/porder/'+supplier+'__'+delivery_date+'?item=1';
     var data = [];
-    var d = {
-        id: '',
-        text: '*** Select a Purchase Order'
-    };    
+
+    if($('select#purchase_order').find('option[value="0"]').length < 1){
+        var d = {
+            id: 0,
+            text: '*** Select a Purchase Order'
+        };
+    }
+        
     var newOption = new Option(d.text, d.id, false, false);
     $('#purchase_order').append(newOption).trigger('change');
     $.get(_url, function(res){
         data = res.data;
-        // console.log(data);
+        console.log(data);
         $.each(data, function(k,v){
             var d = {
-                id: v.purchase_order,
-                text: v.purchase_order
+                id: v.name,
+                text: v.name
             };    
             var newOption = new Option(d.text, d.id, false, false);
             $('#purchase_order').append(newOption).trigger('change');
 
-            if(_auto){
-                var rate = parseInt(v.last_purchase_rate);
-                var amount = rate * v.qty;
-                $('#panel-form-items').find('#itemspurchase_order').val(v.purchase_order);
-                $('#panel-form-items').find('#itemsitem_code').val(v.item_code);
-                $('#panel-form-items').find('#itemsitem_name').val(v.item_name);
-                $('#panel-form-items').find('#itemsqty').val(v.qty);
-                $('#panel-form-items').find('#itemsuom').val(v.stock_uom);
-                $('#panel-form-items').find('#itemsrate').val(rate);
-                $('#panel-form-items').find('#itemsamount').val(amount);
-                addToTableitems();
-            }
+            
 
         });
     }).done(function(){
@@ -247,7 +260,7 @@ function setDBItems(){
     $('table#table-items tbody tr').each(function(k,elm){
         var po = $(elm).find('td.purchase_order input').val();
         var item_code = $(elm).find('td.item_code input').val();
-        db_items[i] = item_code;
+        db_items[i] = po+'__'+item_code;
 
         $(elm).attr('id',po+'__'+item_code);
 

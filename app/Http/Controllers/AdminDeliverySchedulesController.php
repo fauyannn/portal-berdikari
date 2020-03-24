@@ -490,7 +490,7 @@
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
-			$fields 		= "purchase_order,item_code,item_name,qty";
+			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,last_purchase_rate";
 			// $fields 		= "*";
 			
 			$param 			= explode('__',$id);

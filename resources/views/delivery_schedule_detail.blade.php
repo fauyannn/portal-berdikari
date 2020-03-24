@@ -42,6 +42,9 @@
                                                     <th>Item Code</th>
                                                     <th>Item Name</th>
                                                     <th>QTY</th>
+                                                    <th>UOM</th>
+                                                    <th>Rate</th>
+                                                    <th>Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -59,6 +62,15 @@
                                                             </td>
                                                             <td class="">
                                                                 <span class="td-label right">{{ formatMoney($val->qty) }}</span>
+                                                            </td>
+                                                            <td class="">
+                                                                <span class="td-label">{{ ($val->stock_uom) }}</span>
+                                                            </td>
+                                                            <td class="">
+                                                                <span class="td-label right">{{ formatMoney($val->last_purchase_rate) }}</span>
+                                                            </td>
+                                                            <td class="">
+                                                                <span class="td-label right">{{ formatMoney($val->qty * $val->last_purchase_rate) }}</span>
                                                             </td>
                                                         </tr>
                                                     @endforeach

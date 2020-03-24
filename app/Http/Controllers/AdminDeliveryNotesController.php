@@ -48,11 +48,14 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			
-			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'text','readonly'=>true];
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'date from ds','name'=>'delivery_date_from_ds','type'=>'hidden','readonly'=>true];
+			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required'];
+			
 			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
+			
 			// $this->form[] = ['label'=>'Select items','name'=>'item_po','type'=>'hidden','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
 			
@@ -61,8 +64,8 @@
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			// $columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			// $columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Batch No','name'=>'batch_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			
@@ -181,9 +184,14 @@
 				$this->script_js .= '$("input[name=\"supplier\"]").val("'.$_GET['supplier'].'");';
 			}
 			if($_GET['delivery_date']){
+				// $this->script_js .= '$("input[name=\"delivery_date_from_ds\"]").val("'.$_GET['delivery_date'].'");';
 				$this->script_js .= '$("input[name=\"delivery_date\"]").val("'.$_GET['delivery_date'].'");';
 			}		
-
+			if($_GET['items']){
+				$items = ($_GET['items']);
+				$this->script_js .= "$('form').attr('data-items','".$items."');";
+			}
+			
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -419,6 +427,46 @@
 			return $response;	
 		}
 
+		// form Purchase Order
+		public function getPorder($id){
+			$doctype 		= 'Purchase Order';
+			$start 			= 0;
+			$page_length 	= 500;
+			$order_by       = 'name desc';
+			$fields 		= "name";
+			
+			$param 			= explode('__',$id);
+			$supplier		= @$param[0];
+			$delivery_date	= @$param[1];
+
+			$filters['supplier'] = ['=',$supplier];
+			// $filters['delivery_date'] = ['=',$delivery_date];
+			$filters = json_encode($filters);
+
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters,
+					// 'group_by' => 'purchase_order'
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+
+			// pr($datas);
+			$response = @$data->message;			
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+			return $response;
+		}
+
+		// form delivery Schedule
 		public function getPurchaseorder($id){
 			$doctype 		= 'Delivery Schedule';
 			$start 			= 0;
