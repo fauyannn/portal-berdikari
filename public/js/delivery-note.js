@@ -2,7 +2,7 @@
 var _po = '';
 var db_items = [];
 $(document).ready(function(){
-    // $('table#table-detail tr:eq(2)').remove();
+    $('table#table-detail tr:eq(2)').remove();
     $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
@@ -81,9 +81,11 @@ $(document).ready(function(){
 
     $('select#purchase_order').on('change',function(){
         var $this = $(this);
+        var delivery_date = $('#delivery_date').val();
+        var supplier = $('#supplier').val();
         _po = $this.val();
         // console.log(_po);
-        getItemByPO(_po)
+        getItemByPO(supplier,delivery_date,_po)
 
     })
 
@@ -91,13 +93,7 @@ $(document).ready(function(){
         var supplier = $('input#supplier').val();
         var delivery_date = $('input#delivery_date').val();
         // console.log(supplier+' '+delivery_date);
-
-        var i=0;
-        $('table#table-items tbody tr').each(function(k,elm){
-            db_items[i] = $(elm).find('td.item_code input').val();
-            i++;
-        });
-        // console.log(db_items)
+       
         getPO(supplier, delivery_date, true)
     }    
 
@@ -120,19 +116,19 @@ $(document).ready(function(){
             $('#panel-form-items').find('#itemsrate').val(rate);
             $('#panel-form-items').find('#itemsamount').val(amount);
             addToTableitems();
+            setDBItems();
         } else {
             $('table#table-items')
-                .find('td.item_code')
-                .find('input[value="'+item_code+'"]')
-                .closest('tr')
+                .find('tr#'+_po+'__'+item_code)
                 .remove();
         }
         
     })
 });
 
-function getItemByPO(po){
-    var _url = '/admin/purchase_orders/show/'+po;
+function getItemByPO(supplier,delivery_date,po){
+    var param = supplier+'__'+delivery_date+'__'+po;
+    var _url = '/admin/delivery_schedules/item/'+param;
     var data = [];
     
     $('#table-items-po').show();
@@ -169,6 +165,8 @@ function getItemByPO(po){
         var _tr = '';
         $.each(data, function(k,v){
             var _checked = ($.inArray(v.item_code, db_items) != -1) ? 'checked' : '';
+            var _rate = parseInt(v.last_purchase_rate);
+            var _amount = _rate * v.qty;
             _tr += '<tr>'+
             '<td class="pilih">'+
                 '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
@@ -183,13 +181,13 @@ function getItemByPO(po){
                 '<span class="td-label">'+v.qty+'</span>'+
             '</td>'+
             '<td class="uom">'+
-                '<span class="td-label">'+v.uom+'</span>'+
+                '<span class="td-label">'+v.stock_uom+'</span>'+
             '</td>'+
             '<td class="rate">'+
-                '<span class="td-label">'+v.rate+'</span>'+
+                '<span class="td-label">'+_rate+'</span>'+
             '</td>'+
             '<td class="amount">'+
-                '<span class="td-label">'+v.amount+'</span>'+
+                '<span class="td-label">'+_amount+'</span>'+
             '</td>'+
         '</tr>';
         });
@@ -210,7 +208,7 @@ function getPO(supplier, delivery_date, _auto){
     $('#purchase_order').append(newOption).trigger('change');
     $.get(_url, function(res){
         data = res.data;
-        console.log(data);
+        // console.log(data);
         $.each(data, function(k,v){
             var d = {
                 id: v.purchase_order,
@@ -233,5 +231,23 @@ function getPO(supplier, delivery_date, _auto){
             }
 
         });
+    }).done(function(){
+        setDBItems();
     });
+}
+
+
+function setDBItems(){
+    var i=0;
+    $('table#table-items tbody tr').each(function(k,elm){
+        var po = $(elm).find('td.purchase_order input').val();
+        var item_code = $(elm).find('td.item_code input').val();
+        db_items[i] = item_code;
+
+        $(elm).attr('id',po+'__'+item_code);
+
+        // console.log(elm);
+        i++;
+    });
+    // console.log(db_items)
 }

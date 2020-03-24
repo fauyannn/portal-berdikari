@@ -531,4 +531,43 @@
 			return view('delivery_schedule_detail',compact('data'));
 		}
 
+		public function getItem($id){
+			$doctype 		= 'Delivery Schedule';
+			$start 			= 0;
+			$page_length 	= 500;
+			$order_by       = 'modified desc';
+			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,last_purchase_rate";
+			// $fields 		= "*";
+			
+			$param 			= explode('__',$id);
+			$supplier		= @$param[0];
+			$delivery_date	= @$param[1];
+			$po				= @$param[2];
+
+
+			$filters['supplier'] = ['=',$supplier];
+			$filters['delivery_date'] = ['=',$delivery_date];
+			$filters['purchase_order'] = ['=',$po];
+
+			$filters = json_encode($filters);$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'start' => $start,
+					'page_length' => $page_length,
+					'fields' => $fields,
+					'order_by' => $order_by,
+					'filters' => $filters
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			$response = $data->message->data;
+			// pr($response);
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+
+			return $response;
+		}
 	}

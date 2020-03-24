@@ -52,7 +52,7 @@
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			// $this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
 			// $this->form[] = ['label'=>'Select items','name'=>'item_po','type'=>'hidden','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
 			
@@ -497,7 +497,7 @@
 			$filters['item_code'] = ['IN',implode(',',$item_codes)];
 			$filters = json_encode($filters);
 			
-// pr($filters);
+
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
 			$res 	= $client->request('GET', $this->_host.$_url, [
