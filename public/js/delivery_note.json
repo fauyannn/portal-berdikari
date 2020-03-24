@@ -2,7 +2,7 @@
   "set_warehouse": "Stores - BME",
   "posting_date": "2020-03-25",
   "supplier": "CGS INDONESIA",
-  "is_subcontracted": true,
+  "is_subcontracted": "Yes",
   "supplier_warehouse": "Makloon CGS Indonesia - BME",
   "items": [
     {
