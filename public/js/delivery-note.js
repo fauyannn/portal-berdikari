@@ -192,7 +192,8 @@ function getItemByPO(supplier,delivery_date,po){
         // console.log(data);
         var _tr = '';
         $.each(data, function(k,v){
-            var _checked = ($.inArray(_po+'__'+v.item_code, db_items) != -1) ? 'checked' : '';
+            var _id = (_po+'__'+v.item_code).trim().replace(/[_\W]+/g, "-");
+            var _checked = ($.inArray(_id, db_items) != -1) ? 'checked' : '';
             var _rate = parseInt(v.last_purchase_rate);
             var _amount = _rate * v.qty;
             _tr += '<tr>'+
