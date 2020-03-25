@@ -174,8 +174,9 @@
 	        |
 	        */
 			$this->script_js = NULL;
-			
-
+			if(!CRUDBooster::isCreate()){
+				$this->script_js = "$('.btn-create-ds').remove();";
+			}	
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -462,8 +463,10 @@
 							<td>".$val->supplier."</td>
 							<td>".$val->delivery_date."</td>
 							<td>
-							<a class='btn btn-xs btn-success btn-detail' title='Detail Data' href='".$url_cdn."'><i class='fa fa-xx'></i> Create Delivery Note</a>
+							<div class='button_action pull-right'>
+								<a class='btn btn-xs btn-success btn-detail btn-create-ds' title='Detail Data' href='".$url_cdn."'><i class='fa fa-xx'></i> Create Delivery Note</a>
 								<a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a>
+							</div>
 							</td>
 						</tr>";
 				}	

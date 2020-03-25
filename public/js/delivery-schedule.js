@@ -46,8 +46,8 @@ $(document).ready(function(){
                 datalist += "<tr>"+
                         "<td>"+v.supplier+"</td>"+
                         "<td>"+v.delivery_date+"</td>"+
-                        "<td><a class='btn btn-xs btn-success btn-detail' title='Detail Data' href='"+_url_cdn+"'><i class='fa fa-xxx'></i> Create Delivery Note</a> "+
-                        "<a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
+                        "<td><div class='button_action pull-right'><a class='btn btn-xs btn-success btn-detail btn-create-ds' title='Detail Data' href='"+_url_cdn+"'><i class='fa fa-xxx'></i> Create Delivery Note</a> "+
+                        "<a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></div></td>"+
                         "</tr>";
             })
             $('table#table_dashboard tbody').append(datalist);

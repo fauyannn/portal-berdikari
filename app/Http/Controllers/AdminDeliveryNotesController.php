@@ -179,7 +179,9 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 			*/
-			// pr($_GET);
+			
+			$method = CRUDBooster::getCurrentMethod();
+
 			// $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'");';
 			if($_GET['supplier']){
 				$this->script_js .= '$("input[name=\"supplier\"]").val("'.$_GET['supplier'].'");';
@@ -192,7 +194,13 @@
 				$items = ($_GET['items']);
 				$this->script_js .= "$('form').attr('data-items','".$items."');";
 			}
-			
+			$user_id = CRUDBooster::myId();
+			$user = DB::table('cms_users')->find($user_id);
+			$supplier = $user->company;
+
+			if($supplier && $method == 'getAdd'){
+				$this->script_js .= '$("input[name=\"supplier\"]").val("'.$supplier.'");';
+			}
 
             /*
 	        | ---------------------------------------------------------------------- 
