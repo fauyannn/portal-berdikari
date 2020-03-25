@@ -33,15 +33,15 @@
 				unset($result['api_response_fields']);
 				unset($result['qr_code']);
 				$items = \DB::table('delivery_note_items')
-				->select('item_code','item_name','qty','uom','rate','amount','batch_no','serial_no')
+				->select('item_code','item_name','qty','uom','batch_no','serial_no')
 				->where('delivery_note_id',$id)
 				->get();
 
 				// $datas = [];
 				if(count($items)){
 					foreach($items as $k => $val){
-						$items[$k]->batch_no = ($val->batch_no == '-') ? null : $val->batch_no;
-						$items[$k]->serial_no = ($val->serial_no == '-') ? null : $val->serial_no;
+						$items[$k]->batch_no = ($val->batch_no == '-') ? '' : $val->batch_no;
+						$items[$k]->serial_no = ($val->serial_no == '-') ? '' : $val->serial_no;
 					}
 				}
 				return $result['items'] = $items;
