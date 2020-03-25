@@ -579,17 +579,17 @@
 				$datas['delivery_date'] 	= $dn[0]->delivery_date;
 				foreach($dn as $k => $val){
 					$datas['items'][$k] = [
-						'purchase_order'=>$val->purchase_order,
+						// 'purchase_order'=>$val->purchase_order,
 						'item_code'=>$val->item_code,
 						'item_name'=>$val->item_name,
 						'qty'=>$val->qty,
 						'uom'=>$val->uom,
-						'batch_no'=>$val->batch_no,
-						'serial_no'=>$val->serial_no,
+						'batch_no'=> ($val->batch_no == '-') ? '' : $val->batch_no,
+						'serial_no'=>($val->serial_no == '-') ? '' : $val->serial_no,
 					];
 				}
 			}
-			return $data = json_encode($datas);
+			return $data = response()->json($datas);
 		}
 		public function getGenerateqr($id){
 			
