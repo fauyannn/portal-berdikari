@@ -9,6 +9,7 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 
 
 	public function cbInit() {
+		$this->load_js[] = asset("js/users.js");
 		# START CONFIGURATION DO NOT REMOVE THIS LINE
 		$this->table               = 'cms_users';
 		$this->primary_key         = 'id';
@@ -20,6 +21,7 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 	
 		# START COLUMNS DO NOT REMOVE THIS LINE
 		$this->col = array();
+		$this->col[] = array("label"=>"Company","name"=>"company");
 		$this->col[] = array("label"=>"Name","name"=>"name");
 		$this->col[] = array("label"=>"Email","name"=>"email");
 		$this->col[] = array("label"=>"Privilege","name"=>"id_cms_privileges","join"=>"cms_privileges,name");
@@ -28,6 +30,8 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 
 		# START FORM DO NOT REMOVE THIS LINE
 		$this->form = array(); 		
+		$this->form[] = ['label'=>'company','name'=>'company','type'=>'text'];
+		$this->form[] = array("label"=>"Company","name"=>"company",'required'=>true,'validation'=>'required','type'=>'select2');
 		$this->form[] = array("label"=>"Name","name"=>"name",'required'=>true,'validation'=>'required|alpha_spaces|min:3');
 		$this->form[] = array("label"=>"Email","name"=>"email",'required'=>true,'type'=>'email','validation'=>'required|email|unique:cms_users,email,'.CRUDBooster::getCurrentId());		
 		$this->form[] = array("label"=>"Photo","name"=>"photo","type"=>"upload","help"=>"Recommended resolution is 200x200px",'required'=>true,'validation'=>'required|image|max:1000','resize_width'=>90,'resize_height'=>90);											

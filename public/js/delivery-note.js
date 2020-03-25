@@ -91,7 +91,7 @@ $(document).ready(function(){
             var supplier = $this.val();
             var delivery_date = $('input[name="delivery_date"]').val();
             $('input[name="supplier"]').val(supplier);
-            console.log(supplier+' '+delivery_date);
+            // console.log(supplier+' '+delivery_date);
             getPO(supplier, delivery_date, false)
 
         })
