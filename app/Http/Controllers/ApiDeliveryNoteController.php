@@ -30,6 +30,9 @@
 				//This method will be execute after run the main process
 				$id = $result['id'];
 
+				unset($result['supplier_delivery_note']);
+				unset($result['purchase_order']);
+				unset($result['id']);
 				unset($result['api_response_fields']);
 				unset($result['qr_code']);
 				$items = \DB::table('delivery_note_items')
