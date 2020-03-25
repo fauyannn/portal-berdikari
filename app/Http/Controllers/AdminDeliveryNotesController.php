@@ -597,7 +597,8 @@
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
 			$res 	= $client->request('GET', $this->_host.$_url, [
 				'query' => [
-					'url' => url('admin/delivery_notes/json/'.$id)
+					// 'url' => url('admin/delivery_notes/json/'.$id)
+					'url' => url('api/delivery_notes?id='.$id)
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
