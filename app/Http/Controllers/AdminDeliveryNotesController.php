@@ -598,7 +598,7 @@
 			$res 	= $client->request('GET', $this->_host.$_url, [
 				'query' => [
 					// 'url' => url('admin/delivery_notes/json/'.$id)
-					'url' => url('api/delivery_notes?id='.$id)
+					'url' => url('api/delivery_note?id='.$id)
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
