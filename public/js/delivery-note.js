@@ -2,7 +2,23 @@
 var _po = '';
 var db_items = [];
 $(document).ready(function(){
-    $('table#table-detail tr:eq(2)').remove();
+    $('textarea[name="qr_code"]').closest('.form-group').hide();
+    $('input[name="supplier"]').closest('.form-group').hide();
+    var img_qr = $('textarea[name="qr_code"]').val();
+    var html_qr = '<div class="qr_tag pull-right col-sm-2" style="position:absolute;right:30px;"><img src="'+img_qr+'" class="qr_code" style="width:90%;"/></div>';
+    // $('textarea[name="qr_code"]').parent().append(html_qr);
+    $('#parent-form-area').before(html_qr);
+    if($('table#table-detail').length){
+        $('table#table-detail tr:eq(0)').find('td:eq(1)').hide();
+        $('table#table-detail tr:eq(1)').hide();
+        $('table#table-detail tr:eq(4)').find('td:first').text(' ');
+
+        var img_qr = $('table#table-detail tr:eq(0)').find('td:eq(1)').text();
+        var html_qr = '<div class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:100px;"/></div>';
+        $('table#table-detail tr:eq(0)').find('td:eq(1)').show().html(html_qr);
+        $('img.qr_code:eq(0)').hide();
+    }
+    
     // $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
@@ -165,7 +181,7 @@ function getItemByPO(supplier,delivery_date,po){
         return false;
     }
     
-    var _table = '<div class="col-sm-2"></div><div class="col-sm-9"><table id="table-items-po" class="table table-striped table-bordered">'+
+    var _table = '<div class="clearfix"></div><div class="col-sm-2"></div><div class="col-sm-9"><table id="table-items-po" class="table table-striped table-bordered">'+
                     '<thead>'+
                         '<tr>'+
                             '<th></th>'+

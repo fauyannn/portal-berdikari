@@ -49,12 +49,13 @@
 			$this->form = [];
 			
 			// $this->form[] = ['label'=>'Supplier','name'=>'supplier','readonly'=>true,'type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'hidden'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'QR Code','name'=>'qr_code','type'=>'textarea'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-7'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text'];
 			// $this->form[] = ['label'=>'date from ds','name'=>'delivery_date_from_ds','type'=>'hidden','readonly'=>true];
-			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required'];
+			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required','width'=>'col-sm-7'];
 			
-			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9','dataenum'=>''];
+			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-7','dataenum'=>''];
 			
 			// $this->form[] = ['label'=>'Select items','name'=>'item_po','type'=>'hidden','width'=>'col-sm-9'];
 			// $this->form[] = ['label'=>'Supplier Delivery Note','name'=>'supplier_delivery_note','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9'];
@@ -67,7 +68,7 @@
 			// $columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			// $columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Batch No','name'=>'batch_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'textarea','validation'=>'','width'=>'col-sm-10'];
 			
 			
 			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
@@ -592,7 +593,21 @@
 		}
 		public function getGenerateqr($id){
 			
-			// pr($data,1);
+			$_url 	= '/api/method/qr_reader.api.generate';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'url' => url('admin/delivery_notes/json/'.$id)
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			// pr($data->message,1);
+
+			\DB::table('delivery_notes')
+			->where('id',$id)
+			->update(['qr_code'=>$data->message]);
+
+			return $data->message;
 		}
 	    //By the way, you can still create your own method in here... :) 
 
