@@ -387,7 +387,7 @@
 			]);
 			$data = json_decode($res->getBody()->getContents());
 			$data->message->modul_url = CRUDBooster::mainpath('');
-			$data->message->total_rows = $page_length;
+			$data->message->total_rows = count($data->message->data);
 			$data->message->get_start = $_GET['start'];
 
 			 
