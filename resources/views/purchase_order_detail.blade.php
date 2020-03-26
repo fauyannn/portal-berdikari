@@ -19,6 +19,10 @@
                 <table id="table-detail" class="table table-striped">
                     <tbody>
                         <tr>
+                            <td>Supplier</td>
+                            <td>{{ $data->supplier }}</td>
+                        </tr>
+                        <tr>
                             <td>Purchase Order Number</td>
                             <td>{{ $data->name }}</td>
                         </tr>

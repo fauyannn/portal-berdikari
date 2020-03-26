@@ -37,7 +37,7 @@ $(document).ready(function(){
                         "<td>"+v.name+"</td>"+
                         "<td>"+v.transaction_date+"</td>"+
                         "<td class='pull-right'>Rp "+formatMoney(v.grand_total,0,',','.')+"</td>"+
-                        "<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
+                        "<td><div class='button_action pull-right'><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></div></td>"+
                         "</tr>";
             })
             $('table#table_dashboard tbody').append(datalist);

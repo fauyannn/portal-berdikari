@@ -17,8 +17,7 @@
 			$this->_host = $env['host'];
 			$this->_token = $env['token'];
 		}
-	    public function cbInit() {
-
+	    public function cbInit() {		
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
@@ -40,6 +39,7 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
+			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
 			$this->col[] = ["label"=>"Supplier Invoice Number","name"=>"supplier_invoice_number"];
 			$this->col[] = ["label"=>"Supplier Date","name"=>"supplier_date"];
 			$this->col[] = ["label"=>"Purchase Order Number","name"=>"purchase_order_number"];
@@ -50,6 +50,7 @@
 
 			$this->form[] = ['label'=>'supplier_invoice_number','name'=>'supplier_invoice_number','type'=>'hidden'];
 			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required','width'=>'col-sm-9','readonly'=>true];
 			$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'text','validation'=>'required|date','width'=>'col-sm-9','readonly'=>true];
 			$this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden'];
 			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
@@ -349,13 +350,17 @@
 		public function getPurchaseinvoice($id){
 			$order_by 		= 'name desc'; //default
 			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
-
+			if(!CRUDBooster::isSuperadmin()){
+				$user = getUser();
+				$supplier = $user->company;
+				$filters['supplier'] = ['=',$supplier];
+			}
 			$filters = json_encode($filters);
-			// pr($order_by);
+			// pr($filters);
 			$doctype 		= 'Purchase Invoice';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:10;
-			$fields 		= "name, posting_date, posting_time";
+			$fields 		= "name, posting_date, posting_time,supplier";
 			
 			
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
@@ -390,9 +395,15 @@
 		public function getPurchaseorder($id){
 			$order_by 		= 'name desc'; //default
 			$filters		= ["name"=>["like","%".@$_GET['q']."%"]];
+			
+			if(!CRUDBooster::isSuperadmin()){
+				$user = getUser();
+				$supplier = $user->company;
+				$filters['supplier'] = ['=',$supplier];
+			}
 
 			$filters = json_encode($filters);
-			// pr($order_by);
+			// pr($filters);
 			$doctype 		= 'Purchase Order';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:10;

@@ -111,8 +111,9 @@ $(document).ready(function(){
             var data = [];
             $.get(_url, function(res){
                 data = res.data;
-                console.log(data);
+                // console.log(data);
                 $('input#supplier_date').val(data.posting_date)
+                $('input#supplier').val(data.supplier)
                 // insert items
                 $('table#table-items tbody').html('') //clear data childs
                 $.each(data.items,function(k,v){

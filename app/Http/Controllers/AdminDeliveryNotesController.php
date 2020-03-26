@@ -194,8 +194,8 @@
 				$items = ($_GET['items']);
 				$this->script_js .= "$('form').attr('data-items','".$items."');";
 			}
-			$user_id = CRUDBooster::myId();
-			$user = DB::table('cms_users')->find($user_id);
+			
+			$user = getUser();
 			$supplier = $user->company;
 
 			if($supplier && $method == 'getAdd'){
@@ -286,8 +286,13 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
-	            
+			//Your code here
+			if(!CRUDBooster::isSuperadmin()){				
+				$user = getUser();
+				$supplier = $user->company;
+				return $query->where('supplier',$supplier);
+			}
+	        
 	    }
 
 	    /*

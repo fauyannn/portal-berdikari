@@ -52,6 +52,7 @@ $(document).ready(function(){
             })
             $('table#table_dashboard tbody').append(datalist);
             // console.log(datalist);
+            removeAddDN();
             trows +=  parseInt(res.message.data.length);
             var total_rows = 'Total rows : '+trows+' of '+total_data;
             $('.box-body').find('span.pull-right').text(total_rows);

@@ -27,3 +27,9 @@ function env_api(){
 
     return $data[$env];
 }
+
+function getUser($id=false){
+    $user_id = ($id)? $id : CRUDBooster::myId();
+    $user = DB::table('cms_users')->find($user_id);
+    return $user;
+}

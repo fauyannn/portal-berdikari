@@ -175,7 +175,11 @@
 	        */
 			$this->script_js = NULL;
 			if(!CRUDBooster::isCreate()){
-				$this->script_js = "$('.btn-create-ds').remove();";
+				$this->script_js = "function removeAddDN(){
+					$('body').find('.btn-create-ds').remove();
+					};removeAddDN();";
+			} else {
+				$this->script_js = "function removeAddDN(){};removeAddDN();";
 			}	
 
             /*
@@ -387,6 +391,12 @@
 				}
 			}
 			$filters['type'] = ['=','Purchase Order'];
+			
+			if(!CRUDBooster::isSuperadmin()){
+				$user = getUser();
+				$supplier = $user->company;
+				$filters['supplier'] = ['=',$supplier];
+			}			
 			$filters = json_encode($filters);
 			// pr($filters);
 			$doctype 		= 'Delivery Schedule';

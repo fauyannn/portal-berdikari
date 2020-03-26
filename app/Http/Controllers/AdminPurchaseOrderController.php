@@ -360,6 +360,11 @@
 					}
 				}
 			}
+			if(!CRUDBooster::isSuperadmin()){
+				$user = getUser();
+				$supplier = $user->company;
+				$filters['supplier'] = ['=',$supplier];
+			}		
 			$filters = json_encode($filters);
 			// pr($filters);
 			$doctype 		= 'Purchase Order';
@@ -425,7 +430,7 @@
 							<td>".$val->name."</td>
 							<td>".$val->transaction_date."</td>
 							<td class='pull-right'>Rp ".formatMoney($val->grand_total)."</td>
-							<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
+							<td><div class='button_action pull-right'><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></div></td>
 						</tr>";
 				}	
 			}
