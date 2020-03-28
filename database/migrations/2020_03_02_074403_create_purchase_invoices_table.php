@@ -16,8 +16,8 @@ class CreatePurchaseInvoicesTable extends Migration
         Schema::create('purchase_invoices', function (Blueprint $table) {
             $table->increments('id');
             $table->string('supplier_invoice_number')->nullable();
-            $table->date('supplier_date')->nullable();
-            $table->string('purchase_order_number')->nullable();
+            // $table->date('supplier_date')->nullable();
+            // $table->string('purchase_order_number')->nullable();
             $table->text('qr_code')->nullable();
             $table->timestamps();
         });

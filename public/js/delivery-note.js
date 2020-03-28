@@ -2,6 +2,7 @@
 var _po = '';
 var db_items = [];
 $(document).ready(function(){
+    $('#delivery_date').attr('readonly',false);
     $('textarea[name="qr_code"]').closest('.form-group').hide();
     $('input[name="supplier"]').closest('.form-group').hide();
     var img_qr = $('textarea[name="qr_code"]').val();

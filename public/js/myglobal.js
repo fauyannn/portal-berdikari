@@ -13,3 +13,20 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
       console.log(e)
     }
 }
+
+function labelStatus(status){
+  var data = [];
+  data['draft'] = '<span class="label label-danger">'+status+'</span>';
+  data['submited'] = '<span class="label label-primary">'+status+'</span>';
+  data['open'] = '<span class="label label-warning">'+status+'</span>';
+  data['closed'] = '<span class="label label-success">'+status+'</span>';
+  return data[status];
+}
+
+$.urlParam = function(name){
+  var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+  if (results==null) {
+     return null;
+  }
+  return decodeURI(results[1]) || 0;
+}

@@ -10,14 +10,18 @@
 		private $_datas = [];
 		private $_host;
 		private $_token;
+		private $my_company;
 
 		function __construct()
 		{
 			$env = env_api();
 			$this->_host = $env['host'];
 			$this->_token = $env['token'];
+			$this->my_company = env('COMPANY_NAME','BERDIKARI, CV');
 		}
-	    public function cbInit() {		
+	    public function cbInit() {
+			$user = getUser();
+			$supplier = $user->company;
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
@@ -41,20 +45,23 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
 			$this->col[] = ["label"=>"Supplier Invoice Number","name"=>"supplier_invoice_number"];
-			$this->col[] = ["label"=>"Supplier Date","name"=>"supplier_date"];
-			$this->col[] = ["label"=>"Purchase Order Number","name"=>"purchase_order_number"];
+			$this->col[] = ["label"=>"Due Date","name"=>"due_date"];
+			$this->col[] = ["label"=>"Status","name"=>"status"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-
-			$this->form[] = ['label'=>'supplier_invoice_number','name'=>'supplier_invoice_number','type'=>'hidden'];
-			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
-			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required','width'=>'col-sm-9','readonly'=>true];
-			$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'text','validation'=>'required|date','width'=>'col-sm-9','readonly'=>true];
-			$this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden'];
-			$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'id','name'=>'id','type'=>'hidden','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'status','name'=>'status','type'=>'hidden','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required','width'=>'col-sm-9','readonly'=>'1','value'=>$supplier];
+			// $this->form[] = ['label'=>'supplier_invoice_number','name'=>'supplier_invoice_number','type'=>'hidden','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'Due Date','name'=>'due_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'File Invoice','name'=>'file_invoice','type'=>'upload','validation'=>'required|mimes:jpg,jpeg,png,pdf,doc,docx|max:2000','upload_encrypt'=>false,'width'=>'col-sm-9'];
 			
+			$columns[]		= ['label'=>'PO Number','name'=>'purchase_order_number','type'=>'text','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
@@ -62,15 +69,27 @@
 			$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			
-			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9','table'=>'purchase_invoice_items','foreign_key'=>'id_purchase_invoice'];
+			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'purchase_invoice_items','foreign_key'=>'id_purchase_invoice'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Items','name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'purchase_invoice_items','foreign_key'=>'id_purchase_invoice'];
+			//
+			//$this->form[] = ['label'=>'supplier_invoice_number','name'=>'supplier_invoice_number','type'=>'hidden'];
+			//$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			//$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text','validation'=>'required','width'=>'col-sm-9','readonly'=>true];
+			//$this->form[] = ['label'=>'Supplier Date','name'=>'supplier_date','type'=>'text','validation'=>'required|date','width'=>'col-sm-9','readonly'=>true];
+			//$this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden'];
+			//$this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
+			//
+			//$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//$columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			//
+			//$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-9','table'=>'purchase_invoice_items','foreign_key'=>'id_purchase_invoice'];
 			# OLD END FORM
 
 			/* 
@@ -148,7 +167,10 @@
 	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
 	        | 
 	        */
-	        $this->table_row_color = array();     	          
+			$this->table_row_color = array();     
+			// $this->table_row_color[] = ['condition'=>"[status] == 'draft'","color"=>"danger"];
+			// $this->table_row_color[] = ['condition'=>"[status] == 'submited'","color"=>"success"];
+	          
 
 	        
 	        /*
@@ -169,9 +191,25 @@
 	        | javascript code in the variable 
 	        | $this->script_js = "function() { ... }";
 	        |
-	        */
-			// $this->script_js = NULL;
-			$this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
+			*/
+			// pr();
+			$this->script_js = '';
+			$user = getuser();
+			$status = 'draft';
+			$my_company = $this->my_company;
+			// pr($my_company);
+			if(CRUDBooster::getCurrentMethod() == 'getEdit' && $user->company != $my_company){
+				$this->script_js .= '$(".box-footer div.form-group").find("div").append(\'<input type="submit" name="submit" value="Submit" class="btn btn-primary" />\');';
+			}
+			if(CRUDBooster::getCurrentMethod() == 'getEdit' && $user->company == $my_company){
+				$url = url('admin/purchase_invoices/generateinvoice/');
+				$this->script_js .= 'var _id = $("input[name=\"id\"]").val();$(".box-footer div.form-group").find("div").append(\'<input type="button" name="generate_invoice" data-url="'.$url.'/\'+_id+\'" value="Generate Invoice" class="btn btn-primary" style="display:none;" />\');';
+			
+				$url = url('admin/purchase_invoices/closeinvoice/');
+				$this->script_js .= 'var _id2 = $("input[name=\"id\"]").val();$(".box-footer div.form-group").find("div").append(\'<input type="button" name="close_invoice" data-url="'.$url.'/\'+_id2+\'" value="Close Invoice" class="btn btn-warning" style="display:none;" />\');';
+			}
+			
+			// $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
 
 
             /*
@@ -207,7 +245,11 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        $this->load_js[] = asset("js/purchase-invoice.js");
+			$this->load_js[] = asset("js/myglobal.js");
+			$this->load_js[] = asset("js/purchase-invoice.js");
+			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+				$this->load_js[] = asset("js/purchase-invoice-index.js");
+			}
 	        
 	        
 	        
@@ -259,8 +301,16 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
-	            
+			//Your code here
+			// pr($query->toSql(),1);			
+			$user = getUser();
+			$my_company = $this->my_company;
+			if($user->company != $my_company){
+				return $query->where('supplier',$user->company);
+			} else {
+				return $query->where('status','!=','draft');
+			}
+
 	    }
 
 	    /*
@@ -282,7 +332,8 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-
+			$postdata['status'] = 'draft';
+			unset($postdata['id']);
 	    }
 
 	    /* 
@@ -307,8 +358,18 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
+			//Your code here
+			// pr($_POST,1);
 
+			$cek = DB::table('purchase_invoices')->where('id',$id)->first(['status']);
+			// pr($cek,1);
+			if($cek->status != 'draft'){
+				return false;
+			}
+
+			if($_POST['submit'] == 'Submit'){
+				$postdata['status'] = 'submited';
+			}
 	    }
 
 	    /* 
@@ -457,7 +518,37 @@
 			// $response =  response()->json($response);
 			return $response;	
 		}
-	    //By the way, you can still create your own method in here... :) 
+
+		function getGenerateinvoice($id){
+			$cek = DB::table('purchase_invoices')->where('id',$id)->where('status','submited')->count();
+			if(!$cek){
+				return redirect()->to(url('admin/purchase_invoices?e=1'));
+			}
+			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'open']);
+			if($query){
+				return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice success!'));
+				// return cb()->redirect(action("AdminPurchaseInvoicesController@getIndex"), "Generate invoice success!", "success");
+			}
+			return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice failed!'));
+			// return cb()->redirectBack("Generate invoice failed!", "danger");
+			
+		}
+
+		function getCloseinvoice($id){
+			$cek = DB::table('purchase_invoices')->where('id',$id)->where('status','open')->count();
+			if(!$cek){
+				return redirect()->to(url('admin/purchase_invoices?e=1'));
+			}
+			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'closed']);
+			if($query){
+				return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice success!'));
+				// return cb()->redirect(action("AdminPurchaseInvoicesController@getIndex"), "Generate invoice success!", "success");
+			}
+			return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice failed!'));
+			// return cb()->redirectBack("Generate invoice failed!", "danger");
+			
+		}
+	    //By the way, you can still create your own method in here... :)
 
 
 	}

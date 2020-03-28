@@ -1,6 +1,29 @@
 $(document).ready(function(){
+    // var s = $.urlParam('status'); // name
+
+    var status = $('input[name="status"]').val();
+        status = status ? status : $.urlParam('status');
+        status = labelStatus(status);
+    $('.panel-heading:first').append(status);
+
+    $('#due_date').attr('readonly',false);
+    var _id = $("input[name=\"id\"]").val()
+    var _status = $('input[name="status"]').attr('value');
+    if(_status != 'draft' && _id){
+        $('form input[name="submit"]').attr('disabled',true).hide();
+        $('form #table-items a').attr('disabled',true).remove();
+        $('form input').attr('readonly',true);
+        $('form div.child-form-area').parent().css('display','none');
+        $('form #form-group-file_invoice').find('a.btn-delete').remove();
+    }
+    if(_status == 'submited'){
+        $('input[name="generate_invoice"]').show();
+    }
+    if(_status == 'open'){
+        $('input[name="close_invoice"]').show();
+    }
+
     
-    $('div.child-form-area').parent().css('display','none');
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
         $('div.child-form-area').parent().css('display','block');
     })
@@ -12,9 +35,10 @@ $(document).ready(function(){
         // console.log(_this)
         var $this = $(_this);
         var val = $this.find('td:eq(1)').text();
+        var status = $this.find('td:eq(4)').text();
         // console.log(val)
         var url_detail = $this.find('a.btn-detail').attr('href');
-                         $this.find('a.btn-detail').attr('href',url_detail+'&idx='+val);
+                         $this.find('a.btn-detail').attr('href',url_detail+'&idx='+val+'&status='+status);
 
         var url_edit = $this.find('a.btn-edit').attr('href');
                        $this.find('a.btn-edit').attr('href',url_edit+'&idx='+val);
@@ -131,5 +155,92 @@ $(document).ready(function(){
         })
 
     }
+
+    // $('input[value="Submit"]').on('click',function(e){
+    //     var $this = $(this);
+    //     console.log($this.closest('form').attr('id'))
+    //     $this.closest('form').submit();
+        
+
+    //     swal({
+    //         title: "Permanently submit data?",
+    //         text: "Send document to PT. Berdikari Metal Engineering.",
+    //         type: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#3085d6',
+    //         confirmButtonClass: "btn-danger",
+    //         confirmButtonText: "Yes, Submit it!",
+    //         cancelButtonText: "No, cancel please!",
+    //         closeOnConfirm: true,
+    //         closeOnCancel: true
+    //       },
+    //       function(isConfirm) {
+    //         if (isConfirm) {
+    //             console.log($this)
+    //             $this.closest('form').submit();
+    //             e.preventDefault();
+    //             // swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    //         } else {
+    //             e.preventDefault();
+    //             // swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //         }
+    //       });
+    //     //   e.preventDefault();
+    // })
+
+
+    $('input[name="generate_invoice"]').on('click',function(){
+        var $this = $(this);
+        // $this.closest('form').submit();
+        swal({
+            title: "Generate Invoice?",
+            text: "Generate invoice to ERP and change status to open.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, generate it!",
+            cancelButtonText: "No, cancel please!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+            },
+            function(isConfirm) {
+            if (isConfirm) {
+                console.log($this.data('url'));
+                window.location.href = $this.data('url');
+                
+                // swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            } else {
+                // swal("Cancelled", "Your imaginary file is safe :)", "error");
+            }
+        });
+    });
+
+    $('input[name="close_invoice"]').on('click',function(){
+        var $this = $(this);
+        // $this.closest('form').submit();
+        swal({
+            title: "Close Invoice?",
+            text: "Change status invoice to closed.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, close it!",
+            cancelButtonText: "No, cancel please!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+            },
+            function(isConfirm) {
+            if (isConfirm) {
+                // console.log($this.data('url'));
+                window.location.href = $this.data('url');
+                
+                // swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            } else {
+                // swal("Cancelled", "Your imaginary file is safe :)", "error");
+            }
+        });
+    });
 });
 
