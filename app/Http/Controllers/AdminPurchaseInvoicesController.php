@@ -208,6 +208,10 @@
 				$url = url('admin/purchase_invoices/closeinvoice/');
 				$this->script_js .= 'var _id2 = $("input[name=\"id\"]").val();$(".box-footer div.form-group").find("div").append(\'<input type="button" name="close_invoice" data-url="'.$url.'/\'+_id2+\'" value="Close Invoice" class="btn btn-warning" style="display:none;" />\');';
 			}
+			if(CRUDBooster::getCurrentMethod() == 'getEdit'){
+				$url = url('admin/purchase_invoices/reopen/');
+				$this->script_js .= 'var _id3 = $("input[name=\"id\"]").val();$(".box-footer div.form-group").find("div").append(\'<input type="button" name="reopen" data-url="'.$url.'/\'+_id3+\'" value="Re-Open" class="btn btn-info" style="display:none;" />\');';
+			}
 			
 			// $this->script_js = '$("table#table-detail tr:first td:eq(1)").text("'.$_GET['idx'].'")';
 
@@ -303,6 +307,9 @@
 	    public function hook_query_index(&$query) {
 			//Your code here
 			// pr($query->toSql(),1);			
+			if(CRUDBooster::isSuperAdmin()){
+				return true;
+			}
 			$user = getUser();
 			$my_company = $this->my_company;
 			if($user->company != $my_company){
@@ -546,6 +553,19 @@
 			}
 			return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice failed!'));
 			// return cb()->redirectBack("Generate invoice failed!", "danger");
+			
+		}
+
+		function getReopen($id){
+			$cek = DB::table('purchase_invoices')->where('id',$id)->where('status','closed')->count();
+			if(!$cek){
+				return redirect()->to(url('admin/purchase_invoices?e=1'));
+			}
+			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'open']);
+			if($query){
+				return redirect()->to(url('admin/purchase_invoices?e=0&m=Re-Open invoice success!'));
+			}
+			return redirect()->to(url('admin/purchase_invoices?e=0&m=Re-Open invoice failed!'));
 			
 		}
 	    //By the way, you can still create your own method in here... :)

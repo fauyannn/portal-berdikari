@@ -22,6 +22,9 @@ $(document).ready(function(){
     if(_status == 'open'){
         $('input[name="close_invoice"]').show();
     }
+    if(_status == 'closed'){
+        $('input[name="reopen"]').show();
+    }
 
     
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
@@ -193,7 +196,7 @@ $(document).ready(function(){
         var $this = $(this);
         // $this.closest('form').submit();
         swal({
-            title: "Generate Invoice?",
+            title: "Generate this invoice?",
             text: "Generate invoice to ERP and change status to open.",
             type: "warning",
             showCancelButton: true,
@@ -220,7 +223,7 @@ $(document).ready(function(){
         var $this = $(this);
         // $this.closest('form').submit();
         swal({
-            title: "Close Invoice?",
+            title: "Close this invoice?",
             text: "Change status invoice to closed.",
             type: "warning",
             showCancelButton: true,
@@ -236,6 +239,32 @@ $(document).ready(function(){
                 // console.log($this.data('url'));
                 window.location.href = $this.data('url');
                 
+                // swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            } else {
+                // swal("Cancelled", "Your imaginary file is safe :)", "error");
+            }
+        });
+    });
+
+    $('input[name="reopen"]').on('click',function(){
+        var $this = $(this);
+        // $this.closest('form').submit();
+        swal({
+            title: "Reopen this invoice?",
+            text: "Change status invoice to open.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, re-open it!",
+            cancelButtonText: "No, cancel please!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+            },
+            function(isConfirm) {
+            if (isConfirm) {
+                // console.log($this.data('url'));
+                window.location.href = $this.data('url');                
                 // swal("Deleted!", "Your imaginary file has been deleted.", "success");
             } else {
                 // swal("Cancelled", "Your imaginary file is safe :)", "error");
