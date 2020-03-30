@@ -19,6 +19,7 @@
 		    public function hook_before(&$postdata) {
 				$this->_items = $postdata['items'];
 				unset($postdata['items']);
+				unset($postdata['email']);
 				$postdata['status'] = 'draft';
 		        //This method will be execute before run the main process
 
@@ -38,10 +39,38 @@
 						// pr($val,1);
 						DB::table('purchase_invoice_items')->insert((array) $val);
 					}
+				
+
 				}
-				// pr($result,1);
-		        //This method will be execute after run the main process
+				$this->sendEmail($postdata, $result);
 
-		    }
-
-		}
+			}
+			public function sendEmail($postdata, $result)
+			{
+				$q = DB::table('cms_users')
+				->where('company',$postdata['supplier'])
+				->where('id_cms_privileges',3)
+				->first(['email']);
+				$config['to'] = $q->email;
+				$config['judul'] = 'subjeck/judul';
+				$config['data'] = ['supplier' => 'INDTA PRATAMAJAYA', 'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
+				$config['template'] = 'view.email.invoice';
+				$config['attachments'] = [];
+				// pr($config,1);
+				try{
+					\Mail::send('email.invoice', $config['data'], function ($message) use ($config)
+					{
+						$message->subject($config['judul']);
+						$message->from('donotreply@berdikari.com', 'Berdikari');
+						$message->to($config['to']);
+					});
+					// pr('email send',1);
+					// return back()->with('alert-success','Berhasil Kirim Email');
+					return response (['status' => true,'success' => 'Berhasil Kirim Email']);
+				}
+				catch (Exception $e){
+					return response (['status' => false,'errors' => $e->getMessage()]);
+					// pr($e->getMessage());
+				}
+			}
+	}

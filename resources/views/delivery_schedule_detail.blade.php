@@ -1,5 +1,6 @@
 @extends('crudbooster::admin_template')
 @section('content')
+
 <style>
     .right{float:right;}
 </style>

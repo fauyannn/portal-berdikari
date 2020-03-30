@@ -13,13 +13,13 @@
 
 		function __construct()
 		{
+			$this->sendEmail();
 			$env = env_api();
 			$this->_host = $env['host'];
 			$this->_token = $env['token'];
 		}
 
 	    public function cbInit() {
-
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "item_name";
 			$this->limit = "20";
@@ -583,4 +583,14 @@
 
 			return $response;
 		}
+
+		// public function sendEmail(){
+		// 	$config['to'] = 'email@sds.com';
+		// 	$config['data'] = [];
+		// 	$config['template'] = 'view.email.invoice';
+		// 	$config['attachments'] = [];
+		// 	CRUDBooster::sendEmail($config);
+		// 	pr($config,1);
+		// }
+
 	}
