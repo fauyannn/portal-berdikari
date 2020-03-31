@@ -530,12 +530,15 @@
 		}
 
 		function getGenerateinvoice($id){
+
+			// $this->createPurchaseInvoice($id);
 			$cek = DB::table('purchase_invoices')->where('id',$id)->where('status','submited')->count();
 			if(!$cek){
-				return redirect()->to(url('admin/purchase_invoices?e=1'));
+				return CRUDBooster::redirectBack("Generate invoice failed!", "danger");
 			}
 			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'open']);
 			if($query){
+				$this->createPurchaseInvoice($id);
 				// return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice success!'));
 				return CRUDBooster::redirect(action("AdminPurchaseInvoicesController@getIndex"), "Generate invoice success!", "success");
 			}
@@ -603,5 +606,56 @@
 					return response (['status' => false,'errors' => $e->getMessage()]);
 					// pr($e->getMessage());
 				}
+			}
+
+			public function createPurchaseInvoice($id){
+				$data = DB::table('purchase_invoices')->find($id);
+				$doctype 		= 'Purchase Invoice';	
+
+				// {
+				// 	"doctype":"Purchase Invoice",
+				// 	"supplier": "Yamaha",
+				// 	"due_date":"2020-03-30",
+				// 	"bill_no":"1223456",
+				// 	"grand_total":150000,
+				// 	"items": [
+				// 			{
+				// 				"purchase_order": "PUR-ORD-2020-00003",
+				// 				"qty":1,
+				// 				"item_code": "1234-91-91"
+				// 			}
+				// 		]
+				// }
+				$query = [
+					'doctype' => $doctype,
+					'supplier' => $data->supplier,
+					'due_date' => $data->due_date,
+					'bill_no' => $data->supplier_invoice_number,
+					'items' => []
+				];
+				$pi_items = DB::table('purchase_invoice_items')
+					->where('id_purchase_invoice',$id)
+					->get(['item_code','purchase_order_number','qty']);
+				if($pi_items){
+					foreach($pi_items as $key => $val){
+						$query['items'][$key]['item_code'] = $val->item_code;
+						$query['items'][$key]['purchase_order'] = $val->purchase_order_number;
+						$query['items'][$key]['qty'] = $val->qty;
+					}
+
+				}
+				$data = json_encode($query);
+				// $data='{"doctype":"Purchase Invoice","supplier": "Yamaha","due_date":"2020-03-30","bill_no":"1223456","items": [{"purchase_order": "PUR-ORD-2020-00003","qty":1,"item_code": "1234-91-91"}]}';
+				// pr($query,1);			
+				$_url 	= '/api/resource/'.$doctype;
+				$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+				$res 	= $client->request('POST', $this->_host.$_url, [
+					'query' => [
+						'data'=>$data
+						]
+				]);
+				$data = json_decode($res->getBody()->getContents());
+				return true;
+				// pr($data,1);
 			}
 	}
