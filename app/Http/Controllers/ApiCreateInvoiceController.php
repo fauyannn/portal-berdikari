@@ -52,16 +52,16 @@
 				->where('id_cms_privileges',3)
 				->first(['email']);
 				$config['to'] = $q->email;
-				$config['judul'] = 'subjeck/judul';
-				$config['data'] = ['supplier' => 'INDTA PRATAMAJAYA', 'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
+				$config['subject'] = 'Invoice telah dibuat di portal.';
+				$config['data'] = ['name' => 'INDTA PRATAMAJAYA', 'subject'=>$config['subject'],'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
 				$config['template'] = 'view.email.invoice';
 				$config['attachments'] = [];
 				// pr($config,1);
 				try{
 					\Mail::send('email.invoice', $config['data'], function ($message) use ($config)
 					{
-						$message->subject($config['judul']);
-						$message->from('donotreply@berdikari.com', 'Berdikari');
+						$message->subject($config['subject']);
+						$message->from('donotreply@berdikari.com', 'Portal Berdikari');
 						$message->to($config['to']);
 					});
 					// pr('email send',1);

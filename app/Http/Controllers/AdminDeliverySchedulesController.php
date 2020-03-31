@@ -13,7 +13,6 @@
 
 		function __construct()
 		{
-			$this->sendEmail();
 			$env = env_api();
 			$this->_host = $env['host'];
 			$this->_token = $env['token'];

@@ -85,7 +85,7 @@
         <div>
       <!--<img class="mx-auto" width="100" height="100" src="https://d3rlubkewr7oe0.cloudfront.net/production/photos/320x200/809278619209872118_driver.jpg?w=100&h=100&dpr=2&fit=crop&mask=ellipse&crop=faces&faceindex=1&fm=png" />-->
       <h4 class="text-center" style="margin-top: 0; margin-bottom: 0; font-weight: 500; color: inherit; vertical-align: baseline; font-size: 24px; line-height: 28.8px;" align="center">
-	  	Invoice telah dibuat di portal.
+	  	{{$subject}}
 		</h4>
       <h5 class="text-muted text-center" style="margin-top: 0; margin-bottom: 0; font-weight: 500; color: #636c72; vertical-align: baseline; font-size: 20px; line-height: 24px;" align="center">
 	  	{{$datetime}}
@@ -100,7 +100,7 @@
   </table>
 </div>
 
-      <p class="text-left" style="line-height: 24px; font-size: 16px; margin: 0;" align="left">Yth. {{$supplier}},</p>
+      <p class="text-left" style="line-height: 24px; font-size: 16px; margin: 0;" align="left">Yth. {{$name}},</p>
 		<p class="text-left" style="line-height: 24px; font-size: 16px; margin: 0;" align="left">
 			Lorem Ipsum adalah contoh teks atau dummy dalam industri percetakan dan penataan 
 			huruf atau typesetting. Lorem Ipsum telah menjadi standar contoh teks sejak tahun 

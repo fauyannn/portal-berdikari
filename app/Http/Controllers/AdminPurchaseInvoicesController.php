@@ -387,7 +387,10 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-	        //Your code here 
+			//Your code here 
+			$this->sendEmail();
+			// pr($id);
+			// pr('hook_after_edit',1);
 
 	    }
 
@@ -533,11 +536,11 @@
 			}
 			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'open']);
 			if($query){
-				return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice success!'));
-				// return cb()->redirect(action("AdminPurchaseInvoicesController@getIndex"), "Generate invoice success!", "success");
+				// return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice success!'));
+				return CRUDBooster::redirect(action("AdminPurchaseInvoicesController@getIndex"), "Generate invoice success!", "success");
 			}
-			return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice failed!'));
-			// return cb()->redirectBack("Generate invoice failed!", "danger");
+			// return redirect()->to(url('admin/purchase_invoices?e=0&m=Generate invoice failed!'));
+			return CRUDBooster::redirectBack("Generate invoice failed!", "danger");
 			
 		}
 
@@ -548,11 +551,11 @@
 			}
 			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'closed']);
 			if($query){
-				return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice success!'));
-				// return cb()->redirect(action("AdminPurchaseInvoicesController@getIndex"), "Generate invoice success!", "success");
+				// return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice success!'));
+				return CRUDBooster::redirect(action("AdminPurchaseInvoicesController@getIndex"), "Closing invoice success!", "success");
 			}
-			return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice failed!'));
-			// return cb()->redirectBack("Generate invoice failed!", "danger");
+			// return redirect()->to(url('admin/purchase_invoices?e=0&m=Closing invoice failed!'));
+			return CRUDBooster::redirectBack("Generate invoice failed!", "danger");
 			
 		}
 
@@ -563,12 +566,42 @@
 			}
 			$query = DB::table('purchase_invoices')->where('id',$id)->update(['status'=>'open']);
 			if($query){
-				return redirect()->to(url('admin/purchase_invoices?e=0&m=Re-Open invoice success!'));
+				return CRUDBooster::redirect(action("AdminPurchaseInvoicesController@getIndex"), "Re-Open invoice success!", "success");
+				// return redirect()->to(url('admin/purchase_invoices?e=0&m=Re-Open invoice success!'));
 			}
-			return redirect()->to(url('admin/purchase_invoices?e=0&m=Re-Open invoice failed!'));
+			return CRUDBooster::redirectBack("Re-Open invoice failed!", "danger");
+			// return redirect()->to(url('admin/purchase_invoices?e=0&m=Re-Open invoice failed!'));
 			
 		}
 	    //By the way, you can still create your own method in here... :)
 
 
+		public function sendEmail()
+			{
+				$q = DB::table('cms_users')
+				->where('company','BERDIKARI, CV')
+				->where('id_cms_privileges',4)
+				->first(['email','name']);
+				$config['to'] = $q->email;
+				$config['subject'] = 'Invoice telah di submit oleh supplier.';
+				$config['data'] = ['name' => $q->name,'subject'=>$config['subject'], 'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
+				$config['template'] = 'view.email.invoice';
+				$config['attachments'] = [];
+				// pr($config,1);
+				try{
+					\Mail::send('email.invoice', $config['data'], function ($message) use ($config)
+					{
+						$message->subject($config['subject']);
+						$message->from('donotreply@berdikari.com', 'Portal Berdikari');
+						$message->to($config['to']);
+					});
+					// pr('email send',1);
+					// return back()->with('alert-success','Berhasil Kirim Email');
+					return response (['status' => true,'success' => 'Berhasil Kirim Email']);
+				}
+				catch (Exception $e){
+					return response (['status' => false,'errors' => $e->getMessage()]);
+					// pr($e->getMessage());
+				}
+			}
 	}
