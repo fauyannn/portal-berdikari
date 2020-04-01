@@ -61,6 +61,9 @@ $(document).ready(function(){
     }
 
     $('#scan-qr').on('click', function () {
-        $('#exampleModalCenter').modal('show');
+        let qrReader = new QrReader('#qrScanModal');
+        qrReader.initQr().then( qr => {
+            console.log(qr)
+        })
     })
 });

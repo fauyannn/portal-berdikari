@@ -15,3 +15,6 @@ Route::get('/', function () {
     return redirect()->to(url('admin'));
     // return view('welcome');
 });
+
+Route::get('admin/stocklist', 'AdminStockListController@index');
+Route::post('admin/stocklist/submit', 'AdminStockListController@submit');
