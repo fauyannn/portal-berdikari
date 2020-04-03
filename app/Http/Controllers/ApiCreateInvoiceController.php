@@ -52,7 +52,7 @@
 				->where('id_cms_privileges',3)
 				->first(['email']);
 
-				if(!count($q)){
+				if(!$q){
 					return false;
 				}
 
