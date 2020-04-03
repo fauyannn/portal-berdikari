@@ -1,6 +1,8 @@
 $(document).ready(function(){
     // var s = $.urlParam('status'); // name
 
+    $('form div.child-form-area').parent().css('display','none');
+    $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
     var status = $('input[name="status"]').val();
         status = status ? status : $.urlParam('status');
         status = labelStatus(status);
@@ -13,7 +15,6 @@ $(document).ready(function(){
         $('form input[name="submit"]').attr('disabled',true).hide();
         $('form #table-items a').attr('disabled',true).remove();
         $('form input').attr('readonly',true);
-        $('form div.child-form-area').parent().css('display','none');
         $('form #form-group-file_invoice').find('a.btn-delete').remove();
     }
     if(_status == 'submited'){
