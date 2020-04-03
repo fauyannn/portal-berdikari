@@ -51,6 +51,11 @@
 				->where('company',$postdata['supplier'])
 				->where('id_cms_privileges',3)
 				->first(['email']);
+
+				if(!count($q)){
+					return false;
+				}
+
 				$config['to'] = $q->email;
 				$config['subject'] = 'Invoice telah dibuat di portal.';
 				$config['data'] = ['name' => 'INDTA PRATAMAJAYA', 'subject'=>$config['subject'],'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
