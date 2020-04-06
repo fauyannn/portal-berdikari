@@ -14,7 +14,7 @@
     <div class="panel-heading">
         <strong><i class="fa fa-calendar"></i> Delivery Schedule Detail 
         <?php if(CRUDBooster::isCreate()){?>
-        <a class="btn btn-xs btn-success btn-detail pull-right" title="Create Delivery Note" href="/admin/delivery_notes/add?supplier={{ $data->supplier }}&delivery_date={{ $data->delivery_date }}&items={{ json_encode($data->data) }}">Create Delivery Note</a>
+        <a class="btn btn-xs btn-success btn-detail pull-right" title="Create Delivery Note" href="/admin/delivery_notes/add?supplier={{ $data->supplier }}&schedule_date={{ $data->schedule_date }}&items={{ json_encode($data->data) }}">Create Delivery Note</a>
         <?php }?>
         </strong>
     </div>
@@ -29,7 +29,7 @@
                         </tr>
                         <tr>
                             <td>Delivery Date</td>
-                            <td>{{ $data->delivery_date }}</td>
+                            <td>{{ $data->schedule_date }}</td>
                         </tr>
                         <tr class="">
                             <td colspan="2">

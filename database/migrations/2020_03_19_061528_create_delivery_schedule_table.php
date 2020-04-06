@@ -15,15 +15,13 @@ class CreateDeliveryScheduleTable extends Migration
     {
         Schema::create('delivery_schedules', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('type')->nullable();
-            $table->string('number')->nullable();
-            $table->string('customer')->nullable();
-            $table->string('customer_purchase_order')->nullable();
-            $table->string('supplier')->nullable();
+            $table->string('name')->nullable();
+            $table->string('purchase_order')->nullable();
             $table->string('item_code')->nullable();
             $table->string('item_name')->nullable();
             $table->string('qty')->nullable();
-            $table->date('delivery_date')->nullable();
+            $table->string('supplier')->nullable();
+            $table->string('schedule_date')->nullable();
             $table->timestamps();
         });
     }
