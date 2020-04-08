@@ -1,31 +1,26 @@
 class QrReader {
-  element;
-  requestId;
-  video;
-  globalStream;
 
   /**
    *
    * @param element Modal Class/Id
    */
   constructor(element) {
-    this.element = element;
+    this.modalElement = element;
     $(element).modal('show');
-    let self = this
+    self = this
     $(element).on('hide.bs.modal', function () {
       self.onHide()
     })
   }
 
-  self = this;
-  
-  initQr = function() {
+  initQr() {
     return new Promise(resolve => {
-      self.video = document.getElementById("video");
+      this.video = document.getElementById("video");
       let canvasElement = document.getElementById("canvas");
       let canvas = canvasElement.getContext("2d");
 
 // Use facingMode: environment to attemt to get the front camera on phones
+      self = this
       navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}}).then(function (stream) {
         self.video.srcObject = stream;
         self.globalStream = stream;
@@ -35,7 +30,7 @@ class QrReader {
       });
 
       /** Ticking */
-      function tick() {
+      function tick() {;
         self.requestId = undefined;
         if (self.video.readyState == self.video.HAVE_ENOUGH_DATA) {
           if (screen.height * 70 / 100 < self.video.videoHeight) {
@@ -57,6 +52,7 @@ class QrReader {
           });
 
           if (code) {
+            $(self.modalElement).modal('hide');
             resolve(code.data);
             return;
           }
@@ -72,11 +68,11 @@ class QrReader {
     })
   };
 
-  onHide = function () {
-    cancelAnimationFrame(requestId);
-    self.requestId = null;
-    if(self.globalStream) {
-      self.globalStream.getTracks().forEach(function(track) {
+  onHide() {
+    cancelAnimationFrame(this.requestId);
+    this.requestId = null;
+    if(this.globalStream) {
+      this.globalStream.getTracks().forEach(function(track) {
         track.stop();
       });
     }

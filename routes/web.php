@@ -16,5 +16,10 @@ Route::get('/', function () {
     // return view('welcome');
 });
 
-Route::get('admin/stocklist', 'AdminStockListController@index');
-Route::post('admin/stocklist/submit', 'AdminStockListController@submit');
+Route::prefix('admin/stocklist')->group(function (){
+    Route::get('/', 'AdminStockListController@index');
+    Route::get('/company/{company?}', 'AdminStockListController@index');
+    Route::post('/submit', 'AdminStockListController@submit');
+    Route::post('/processqr', 'AdminStockListController@processQr');
+    Route::get('/select_company', 'AdminStockListController@selectCompany');
+});
