@@ -42,7 +42,7 @@
 			$this->col = [];
 			// $this->col[] = ["label"=>"Type","name"=>"type"];
 			$this->col[] = ["label"=>"Supplier","name"=>"supplier"];
-			$this->col[] = ["label"=>"Delivery Date","name"=>"delivery_date"];
+			$this->col[] = ["label"=>"Schedule Date","name"=>"schedule_date"];
 			// $this->col[] = ["label"=>"Item Code","name"=>"item_code"];
 			// $this->col[] = ["label"=>"Item Name","name"=>"item_name"];
 			// $this->col[] = ["label"=>"Qty","name"=>"qty"];
@@ -58,7 +58,7 @@
 			$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Schedule Date','name'=>'schedule_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
@@ -71,7 +71,7 @@
 			//$this->form[] = ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			//$this->form[] = ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			//$this->form[] = ['label'=>'Qty','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
+			//$this->form[] = ['label'=>'Delivery Date','name'=>'schedule_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
 			# OLD END FORM
 
 			/* 
@@ -364,15 +364,15 @@
 			$this->table = "delivery_schedules";
 			// pr($_GET);
 			
-			$order_by 		= 'delivery_date desc'; //default
+			$order_by 		= 'schedule_date desc'; //default
 			$filters		= [];
 			$arrfield = [
-				$this->table.'.type' => 'type',
-				$this->table.'.number'=>'sales_order',
+				$this->table.'.supplier' => 'supplier',
+				$this->table.'.number'=>'purchase_order',
 				$this->table.'.item_code' => 'item_code',
 				$this->table.'.item_name' => 'item_name',
 				$this->table.'.qty' => 'qty',
-				$this->table.'.delivery_date' => 'delivery_date',
+				$this->table.'.schedule_date' => 'schedule_date',
 				];
 				
 			if($_GET['filter_column']){
@@ -389,7 +389,6 @@
 					}
 				}
 			}
-			$filters['type'] = ['=','Purchase Order'];
 			
 			if(!CRUDBooster::isSuperadmin()){
 				$user = getUser();
@@ -398,10 +397,10 @@
 			}			
 			$filters = json_encode($filters);
 			// pr($filters);
-			$doctype 		= 'Delivery Schedule';
+			$doctype 		= 'Purchase Receipt Schedule';
 			$start 			= $_GET['start']?:0;
 			$page_length 	= $_GET['limit']?:20;
-			$fields 		= "name,po_no,item_code,customer,qty,sales_order,delivery_date,item_name,type,purchase_order,supplier";
+			$fields 		= "name,purchase_order,item_code,qty,item_name,supplier,schedule_date";
 			
 			
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
@@ -414,13 +413,13 @@
 					'fields' => $fields,
 					'order_by' => $order_by,
 					'filters' => $filters,
-					'group_by'=> 'supplier, delivery_date'
+					'group_by'=> 'supplier, schedule_date'
 					]
 			]);
 			$data = json_decode($res->getBody()->getContents());
 			// pr($data);
 			$data->message->modul_url = CRUDBooster::mainpath('');
-			$data->message->total_rows = count($data->message->data);
+			$data->message->total_rows = @count($data->message->data);
 			$data->message->get_start = $_GET['start'];
 
 			 
@@ -455,8 +454,8 @@
 			$datalist = "<table id='temp' style='display:none;'>";
 			if($datas){	
 				foreach($datas as $key => $val){
-					$id = $val->supplier.'__'.$val->delivery_date;
-					$url_cdn = CRUDBooster::mainpath('../delivery_notes/add?supplier='.$val->supplier.'&delivery_date='.$val->delivery_date);
+					$id = $val->supplier.'__'.$val->schedule_date;
+					$url_cdn = CRUDBooster::mainpath('../delivery_notes/add?supplier='.$val->supplier.'&schedule_date='.$val->schedule_date);
 					$url     = CRUDBooster::mainpath('show/'.$id);
 										
 					// $datalist .= "<tr>
@@ -465,12 +464,12 @@
 					// 		<td>".$val->item_code."</td>
 					// 		<td>".$val->item_name."</td>
 					// 		<td class='pull-right'>".formatMoney($val->qty)."</td>
-					// 		<td>".$val->delivery_date."</td>
+					// 		<td>".$val->schedule_date."</td>
 					// 		<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='".$url."'><i class='fa fa-eye'></i></a></td>
 					// 	</tr>";
 					$datalist .= "<tr>
 							<td>".$val->supplier."</td>
-							<td>".$val->delivery_date."</td>
+							<td>".$val->schedule_date."</td>
 							<td>
 							<div class='button_action pull-right'>
 								<a class='btn btn-xs btn-success btn-detail btn-create-ds' title='Detail Data' href='".$url_cdn."'><i class='fa fa-xx'></i> Create Delivery Note</a>
@@ -498,7 +497,7 @@
 		}
 
 		public function getShow($id){
-			$doctype 		= 'Delivery Schedule';
+			$doctype 		= 'Purchase Receipt Schedule';
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
@@ -507,11 +506,11 @@
 			
 			$param 			= explode('__',$id);
 			$supplier		= @$param[0];
-			$delivery_date	= @$param[1];
+			$schedule_date	= @$param[1];
 
 
 			$filters['supplier'] = ['=',$supplier];
-			$filters['delivery_date'] = ['=',$delivery_date];
+			$filters['schedule_date'] = ['=',$schedule_date];
 			$filters = json_encode($filters);
 
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
@@ -525,9 +524,7 @@
 					'order_by' => $order_by,
 					'filters' => $filters
 					]
-			]);
-			
-			
+			]);			
 			
 			// $_url = '/api/resource/Delivery Schedule/'.$id;
 			// $client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
@@ -535,16 +532,16 @@
 
 			$data = json_decode($res->getBody()->getContents());
 			$data->message->supplier = $supplier;
-			$data->message->delivery_date = $delivery_date;
+			$data->message->schedule_date = $schedule_date;
 			// $data['message']['data']['supplier'] = $supplier;
-			// $data['message']['data']['delivery_date'] = $delivery_date;
+			// $data['message']['data']['schedule_date'] = $schedule_date;
 			$data = $data->message;
 			// pr($data);
 			return view('delivery_schedule_detail',compact('data'));
 		}
 
 		public function getItem($id){
-			$doctype 		= 'Delivery Schedule';
+			$doctype 		= 'Purchase Receipt Schedule';
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
@@ -553,12 +550,12 @@
 			
 			$param 			= explode('__',$id);
 			$supplier		= @$param[0];
-			$delivery_date	= @$param[1];
+			$schedule_date	= @$param[1];
 			$po				= @$param[2];
 
 
 			$filters['supplier'] = ['=',$supplier];
-			$filters['delivery_date'] = ['=',$delivery_date];
+			$filters['schedule_date'] = ['=',$schedule_date];
 			$filters['purchase_order'] = ['=',$po];
 
 			$filters = json_encode($filters);$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';

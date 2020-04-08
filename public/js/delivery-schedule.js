@@ -18,9 +18,9 @@ $(document).ready(function(){
         $this = $(this);
         start = parseInt(start+_limit);
         var _url = $this.data('href')+'&start='+start;
-        console.log(_url)
+        // console.log(_url)
         var datalist = '';
-        console.log(trows +' -- '+total_data);
+        // console.log(trows +' -- '+total_data);
         if(trows >= total_data){
             return false;
         }
@@ -30,8 +30,8 @@ $(document).ready(function(){
             var modul_url = res.message.modul_url;
             total_data = res.message.total_data;
             $.each(res.message.data,function(k,v){
-                var id = v.supplier+'__'+v.delivery_date;
-                var _url_cdn = modul_url+'/../delivery_notes/add?supplier='+v.supplier+'&delivery_date='+v.delivery_date;
+                var id = v.supplier+'__'+v.schedule_date;
+                var _url_cdn = modul_url+'/../delivery_notes/add?supplier='+v.supplier+'&schedule_date='+v.schedule_date;
                 var _url = modul_url+'/show/'+id;
                           
                 // datalist += "<tr>"+
@@ -40,12 +40,12 @@ $(document).ready(function(){
                 //         "<td>"+v.item_code+"</td>"+
                 //         "<td>"+v.item_name+"</td>"+
                 //         "<td class='pull-right'>"+formatMoney(v.qty,0,',','.')+"</td>"+
-                //         "<td>"+v.delivery_date+"</td>"+
+                //         "<td>"+v.schedule_date+"</td>"+
                 //         "<td><a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></td>"+
                 //         "</tr>";
                 datalist += "<tr>"+
                         "<td>"+v.supplier+"</td>"+
-                        "<td>"+v.delivery_date+"</td>"+
+                        "<td>"+v.schedule_date+"</td>"+
                         "<td><div class='button_action pull-right'><a class='btn btn-xs btn-success btn-detail btn-create-ds' title='Detail Data' href='"+_url_cdn+"'><i class='fa fa-xxx'></i> Create Delivery Note</a> "+
                         "<a class='btn btn-xs btn-primary btn-detail' title='Detail Data' href='"+_url+"'><i class='fa fa-eye'></i></a></div></td>"+
                         "</tr>";
