@@ -112,16 +112,20 @@ class AdminStockListController extends Controller
         });
     }
 
-    public function processQr(Request $request)
+    public function processQr(Request $request, $company = null)
     {
         $url = '/api/resource/Stock Entry/' . $request->input('name');
         $guzzle = new Client(['headers' => ['Authorization' => 'token ' . $this->_token]]);
         $response = $guzzle->request('GET', $this->_host . $url);
         $stockEntry = json_decode($response->getBody()->getContents());
         $items = $stockEntry->data->items;
-        DB::transaction(function () use ($items) {
+        DB::transaction(function () use ($company, $items) {
             foreach ($items as $item) {
-                $rowStock = Stock::where('item_code', $item->item_code)->where('type', 1)->first();
+                $stockQuery = Stock::where('item_code', $item->item_code)->where('type', 1);
+                if($company) {
+                    $stockQuery->where('supplier', $company);
+                }
+                $rowStock = $stockQuery->first();
                 if (!$rowStock) {
                     $rowStock = new Stock;
                     $rowStock->item_code = $item->item_code;

@@ -33,25 +33,12 @@ $(document).ready(function(){
     });
 
     $('#scanQr').on('click', function () {
-        let qrReader = new QrReader('#qrScanModal');
-        qrReader.initQr().then( qr => {
-            try {
-                json = JSON.parse(qr)
-            }
-            catch {
-                alert("QR not valid.");
-            }
-            if(json.doctype != 'Stock Entry') {
-                alert("QR not valid.");
-            }
-            $.post('/admin/stocklist/processqr', json, function (result) {
-                if(result == 'success') {
-                    alert('Scan QR success')
-                    window.location.href = window.location.href
-                } else {
-                    alert('There is an error in the scan process')
-                }
-            })
-        })
+        let url = '/admin/stocklist/processqr';
+        let companyName = $('#company').val();
+        if(companyName) {
+            url += '/company/'+companyName;
+        }
+        let qrReader = new QrReader('#qrScanModal',url, 'Stock Entry');
+        qrReader.initQr();
     })
 });

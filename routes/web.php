@@ -21,5 +21,6 @@ Route::prefix('admin/stocklist')->group(function (){
     Route::get('/company/{company?}', 'AdminStockListController@index');
     Route::post('/submit', 'AdminStockListController@submit');
     Route::post('/processqr', 'AdminStockListController@processQr');
+    Route::post('/processqr/company/{company?}', 'AdminStockListController@processQr');
     Route::get('/select_company', 'AdminStockListController@selectCompany');
 });
