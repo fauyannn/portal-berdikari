@@ -15,19 +15,7 @@ class QrReader {
     $(element).on('hide.bs.modal', function () {
       self.onHide()
     })
-    //this.checkPermission()
   }
-
-  checkPermission() {
-    navigator.permissions.query({name: 'camera'})
-      .then(permissionObj => {
-        console.log(permissionObj)
-      })
-      .catch(error => {
-        console.log('Got error :', error);
-      })
-  }
-
 
   initQr() {
       this.video = document.getElementById("video");
@@ -43,6 +31,10 @@ class QrReader {
           self.video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
           self.video.play();
           tick();
+        })
+        .catch(function (e) {
+          alert("Permission to use camera is denied, please allow the camera permission in the browser settings");
+          $(self.modalElement).modal('hide');
         });
 
       /** Ticking */
