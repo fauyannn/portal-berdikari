@@ -13,9 +13,8 @@
 
 		function __construct()
 		{
-			$env = env_api();
-			$this->_host = $env['host'];
-			$this->_token = $env['token'];
+			$this->_host = env('ERP_URL');;
+			$this->_token = env('ERP_TOKEN');;
 		}
 
 	    public function cbInit() {
@@ -501,7 +500,7 @@
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
-			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,last_purchase_rate";
+			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,rate";
 			// $fields 		= "*";
 			
 			$param 			= explode('__',$id);
@@ -536,8 +535,17 @@
 			// $data['message']['data']['supplier'] = $supplier;
 			// $data['message']['data']['schedule_date'] = $schedule_date;
 			$data = $data->message;
-			// pr($data);
-			return view('delivery_schedule_detail',compact('data'));
+			$po = [];
+			if(count($data->data)){
+				foreach($data->data as $k => $val){
+					$po['po'][$val->purchase_order] = $val->purchase_order;
+					$po['item_code'][$val->item_code] = $val->item_code;
+				}
+			}
+			$items = getItemPO($po);
+			
+			// pr($items);
+			return view('delivery_schedule_detail',compact('data','items'));
 		}
 
 		public function getItem($id){
@@ -545,7 +553,7 @@
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
-			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,last_purchase_rate";
+			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,rate";
 			// $fields 		= "*";
 			
 			$param 			= explode('__',$id);

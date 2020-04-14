@@ -76,7 +76,7 @@
                                                                 <span class="td-label right">Rp {{ formatMoney($val->rate) }}</span>
                                                             </td>
                                                             <td class="">
-                                                                <span class="td-label right">Rp {{ formatMoney($val->amount) }}</span>
+                                                                <span class="td-label right">Rp {{ formatMoney($val->qty * $val->rate) }}</span>
                                                             </td>
                                                         </tr>
                                                     @endforeach

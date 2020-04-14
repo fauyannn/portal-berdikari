@@ -1,6 +1,25 @@
+var _po = '';
+var db_items = [];
+var get_item_from= '';
 $(document).ready(function(){
     // var s = $.urlParam('status'); // name
 
+    $('#form-group-get_item_from input').on('change',function(){
+        var $this = $(this);
+        var val = $this.val();
+        get_item_from = val;
+        $('div#form-group-purchase_order_number').hide();
+        if(val == 'poe' || val == 'dnp'){
+            var supplier = $('[name="supplier"]').val();
+            getPO(supplier);
+            $('div#form-group-purchase_order_number').slideDown(300);
+        }
+    })
+
+
+    if($('[name="_file_invoice"]').length){
+        $('input[value="Submit"]').removeClass('hide');
+    }
     $('form div.child-form-area').parent().css('display','none');
     $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
     var status = $('input[name="status"]').val();
@@ -50,115 +69,243 @@ $(document).ready(function(){
     })
 
 
-    if ( $( "select#supplier_invoice_number").length ) {
-        $('select#supplier_invoice_number').attr('id','my_supplier_invoice_number');
-        var _url = '/admin/purchase_invoices/purchaseinvoice/1';
-        $('#my_supplier_invoice_number').select2({
-            placeholder: {
-                id: '-1',
-                text: '** Please select a Purchase Invoice'
-            },
-            allowClear: true,
-            minimumInputLength: 1,
-            ajax: {
-                url: _url,
-                delay: 250,
-                dataType: 'json',
-                data: function (params) {
-                    return {
-                        q: $.trim(params.term)
-                    };
-                },
-                processResults: function (data) {
-                    // console.log(data.items)
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            },escapeMarkup: function (markup) {
-                return markup;
-            },
-        });
+    function getPO(supplier){
+
+        var _url = '/admin/purchase_invoices/podn/'+supplier+'?item=2';
+        if(get_item_from == 'poe'){
+            _url = '/admin/delivery_notes/porder/'+supplier+'?item=1';
+        } 
         
-
-        var _val = $('input[name="supplier_invoice_number"]').val();
-        var data = {
-            id: _val,
-            text: _val
-        };    
-        var newOption = new Option(data.text, data.id, false, false);
-        $('#my_supplier_invoice_number').append(newOption).trigger('change');
-
-        $('select#purchase_order_number').attr('id','my_purchase_order_number');
-        var _url = '/admin/purchase_invoices/purchaseorder/1';
-        $('#my_purchase_order_number').select2({
-            placeholder: {
-                id: '-1',
-                text: '** Please select a Purchase Order Number'
-            },
-            allowClear: true,
-            minimumInputLength: 1,
-            ajax: {
-                url: _url,
-                delay: 250,
-                dataType: 'json',
-                data: function (params) {
-                    return {
-                        q: $.trim(params.term)
-                    };
-                },
-                processResults: function (data) {
-                    // console.log(data.items)
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            },escapeMarkup: function (markup) {
-                return markup;
-            },
-        });
-        
-
-        var _val = $('input[name="purchase_order_number"]').val();
-        var data = {
-            id: _val,
-            text: _val
-        };    
-        var newOption = new Option(data.text, data.id, false, false);
-        $('#my_purchase_order_number').append(newOption).trigger('change');
-
-
-        
-        $('#my_supplier_invoice_number').on('change',function(){
-            var $this = $(this);
-            var val = $this.val();
-            console.log(val);
-            var _url = '/admin/purchase_invoices/purchaseinvoicedetail/1?idx='+val;
-            var data = [];
-            $.get(_url, function(res){
-                data = res.data;
-                // console.log(data);
-                $('input#supplier_date').val(data.posting_date)
-                $('input#supplier').val(data.supplier)
-                // insert items
-                $('table#table-items tbody').html('') //clear data childs
-                $.each(data.items,function(k,v){
-                    $('input#itemsitem_code').val(v.item_code)
-                    $('input#itemsitem_name').val(v.item_name)
-                    $('input#itemsqty').val(v.qty)
-                    $('input#itemsuom').val(v.uom)
-                    $('input#itemsrate').val(v.rate)
-                    $('input#itemsamount').val(v.amount)
-                    $('input#btn-add-table-items').click()
-                })
-
+        var data = [];
+    
+        // if($('select#purchase_order_number').find('option[value="0"]').length < 1){
+            var d = {
+                id: 0,
+                text: '*** Select a Purchase Order Number'
+            };
+            var newOption = new Option(d.text, d.id, false, false);
+            $('select#purchase_order_number').html(newOption).trigger('change');
+        // }
+            
+        $.get(_url, function(res){
+            data = res.data;
+            console.log(data);
+            $.each(data, function(k,v){
+                var d = {
+                    id: v.name,
+                    text: v.name
+                };    
+                var newOption = new Option(d.text, d.id, false, false);
+                $('select#purchase_order_number').append(newOption).trigger('change');            
+    
             });
-
-        })
-
+            
+            
+        }).done(function(){
+            setDBItems();
+        });
     }
+    
+    
+    function setDBItems(){
+        var i=0;
+        $('table#table-items tbody tr').each(function(k,elm){
+            var po = $(elm).find('td.purchase_order_number input').val();
+            var item_code = $(elm).find('td.item_code input').val();
+            var _id = (po+'__'+item_code).trim().replace(/[_\W]+/g, "-");
+            db_items[i] = _id;
+    
+            $(elm).attr('id',_id);
+    
+            // console.log(elm);
+            i++;
+        });
+        // console.log(db_items)
+    }
+
+    $('select#purchase_order_number').on('change',function(){
+        var $this = $(this);
+        var supplier = $('input[name="supplier"]').val();
+        _po = $this.val();
+        // console.log(_po);
+        getItemByPO(supplier,_po)
+    })
+    function getItemByPO(supplier,po){
+        // var param = supplier+'__'+delivery_date+'__'+po;
+        var _url = '/admin/purchase_invoices/items/'+po;
+        if(get_item_from == 'poe'){
+            _url = '/admin/purchase_orders/show/'+po;
+        }
+        
+        var data = [];
+        
+        $('#table-items-po').show();
+        if(po == 0){
+            $('#table-items-po').hide();
+            return false;
+        }
+        
+        var _table = '<div class="clearfix"></div><div class="col-sm-2"></div><div class="col-sm-9"><table id="table-items-po" class="table table-striped table-bordered">'+
+                        '<thead>'+
+                            '<tr>'+
+                                '<th></th>'+
+                                '<th>Item Code</th>'+
+                                '<th>Item Name</th>'+
+                                '<th>QTY</th>'+
+                                '<th>UOM</th>'+
+                                '<th>Rate</th>'+
+                                '<th>Amount</th>'+
+                            '</tr>'+
+                        '</thead>'+
+                        '<tbody><tr><td colspan="7"><center>loading...</center></td></tr>'+
+                        
+                        '</tbody>'+
+                    '</table></div>';
+    
+        
+        if(!$('#table-items-po').length){
+            $('#form-group-purchase_order_number').append(_table);
+        }
+        
+        $.get(_url, function(res){
+            data = res;
+            // console.log(data);
+            var _tr = '';
+            $.each(data, function(k,v){
+                var _id = (_po+'__'+v.item_code).trim().replace(/[_\W]+/g, "-");
+                var _checked = ($.inArray(_id, db_items) != -1) ? 'checked' : '';
+                var _rate = parseInt(v.rate);
+                var _amount = _rate * v.qty;
+                _tr += '<tr>'+
+                '<td class="pilih">'+
+                    '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
+                '</td>'+
+                '<td class="item_code">'+
+                    '<span class="td-label">'+v.item_code+'</span>'+                                  
+                '</td>'+
+                '<td class="item_name">'+
+                    '<span class="td-label">'+v.item_name+'</span>'+                                     
+                '</td>'+
+                '<td class="qty">'+
+                    '<span class="td-label pull-right">'+v.qty+'</span>'+
+                '</td>'+
+                '<td class="uom">'+
+                    '<span class="td-label">'+(v.stock_uom ? v.stock_uom : v.uom)+'</span>'+
+                '</td>'+
+                '<td class="rate">'+
+                    '<span class="td-label pull-right">'+_rate+'</span>'+
+                '</td>'+
+                '<td class="amount">'+
+                    '<span class="td-label pull-right">'+_amount+'</span>'+
+                '</td>'+
+            '</tr>';
+            });
+            // console.log(_tr)
+            $('body').find('#table-items-po').find('tbody').html(_tr);
+        });
+    }    
+
+    $(document).on('click','input.pilih',function(){
+        var $this = $(this);
+        var item_code   = $this.closest('tr').find('td.item_code').text();
+        var item_name   = $this.closest('tr').find('td.item_name').text();
+        var qty         = $this.closest('tr').find('td.qty').text();
+        var uom         = $this.closest('tr').find('td.uom').text();
+        var rate        = $this.closest('tr').find('td.rate').text();
+        var amount      = $this.closest('tr').find('td.amount').text();
+        // console.log(_po)
+        if($this.is(':checked')) {
+            $('#panel-form-items').find('#itemspurchase_order_number').val(_po);
+            $('#panel-form-items').find('#itemsitem_code').val(item_code);
+            $('#panel-form-items').find('#itemsitem_name').val(item_name);
+            $('#panel-form-items').find('#itemsqty').val(qty);
+            $('#panel-form-items').find('#itemsuom').val(uom);
+            $('#panel-form-items').find('#itemsrate').val(rate);
+            $('#panel-form-items').find('#itemsamount').val(amount);
+            // $('#panel-form-items').find('#itemsbatch_no').val('-');
+            // $('#panel-form-items').find('#itemsserial_no').val('-');
+            addToTableitems();
+            setDBItems();
+
+            $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
+        } else {
+            $('table#table-items')
+                .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
+                .remove();
+        }
+        
+    });
+
+    // if ( $( "select#supplier_invoice_number").length ) {
+    //     $('select#supplier_invoice_number').attr('id','my_supplier_invoice_number');
+    //     var _url = '/admin/purchase_invoices/purchaseinvoice/1';
+    //     $('#my_supplier_invoice_number').select2({
+    //         placeholder: {
+    //             id: '-1',
+    //             text: '** Please select a Purchase Invoice'
+    //         },
+    //         allowClear: true,
+    //         minimumInputLength: 1,
+    //         ajax: {
+    //             url: _url,
+    //             delay: 250,
+    //             dataType: 'json',
+    //             data: function (params) {
+    //                 return {
+    //                     q: $.trim(params.term)
+    //                 };
+    //             },
+    //             processResults: function (data) {
+    //                 // console.log(data.items)
+    //                 return {
+    //                     results: data
+    //                 };
+    //             },
+    //             cache: true
+    //         },escapeMarkup: function (markup) {
+    //             return markup;
+    //         },
+    //     });
+        
+
+    //     var _val = $('input[name="supplier_invoice_number"]').val();
+    //     var data = {
+    //         id: _val,
+    //         text: _val
+    //     };    
+    //     var newOption = new Option(data.text, data.id, false, false);
+    //     $('#my_supplier_invoice_number').append(newOption).trigger('change');
+
+        
+        
+    //     $('#my_supplier_invoice_number').on('change',function(){
+    //         var $this = $(this);
+    //         var val = $this.val();
+    //         console.log(val);
+    //         var _url = '/admin/purchase_invoices/purchaseinvoicedetail/1?idx='+val;
+    //         var data = [];
+    //         $.get(_url, function(res){
+    //             data = res.data;
+    //             // console.log(data);
+    //             $('input#supplier_date').val(data.posting_date)
+    //             $('input#supplier').val(data.supplier)
+    //             // insert items
+    //             $('table#table-items tbody').html('') //clear data childs
+    //             $.each(data.items,function(k,v){
+    //                 $('input#itemsitem_code').val(v.item_code)
+    //                 $('input#itemsitem_name').val(v.item_name)
+    //                 $('input#itemsqty').val(v.qty)
+    //                 $('input#itemsuom').val(v.uom)
+    //                 $('input#itemsrate').val(v.rate)
+    //                 $('input#itemsamount').val(v.amount)
+    //                 $('input#btn-add-table-items').click()
+    //             })
+
+    //         });
+
+    //     })
+
+    // }
 
     // $('input[value="Submit"]').on('click',function(e){
     //     var $this = $(this);

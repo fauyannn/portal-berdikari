@@ -65,10 +65,10 @@
 			$columns[] 		= ['label'=>'Item Name','name'=>'item_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10','readonly'=>true];
 			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10','readonly'=>true];
 			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10','readonly'=>true];
-			// $columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			// $columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Batch No','name'=>'batch_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'textarea','validation'=>'','width'=>'col-sm-10'];
+			// $columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+			// $columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			
 			
 			$this->form[] = ['label'=>'Items','columns'=>$columns,'name'=>'detail','type'=>'child','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10','table'=>'delivery_note_items','foreign_key'=>'delivery_note_id'];
@@ -487,7 +487,7 @@
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'purchase_order desc';
-			$fields 		= "purchase_order,item_code, item_name, qty,stock_uom,last_purchase_rate";
+			$fields 		= "purchase_order,item_code, item_name, qty,stock_uom,last_purchase_rate,rate";
 			
 			$param 			= explode('__',$id);
 			$supplier		= @$param[0];
@@ -553,7 +553,7 @@
 			$start 			= 0;
 			$page_length 	= 1000;
 			$order_by       = 'item_code desc';
-			$fields 		= "item_code,stock_uom,last_purchase_rate";
+			$fields 		= "item_code,stock_uom,last_purchase_rate,rate";
 			
 			$param 			= explode('__',$id);
 			$supplier		= @$param[0];

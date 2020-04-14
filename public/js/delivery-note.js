@@ -1,7 +1,8 @@
-
 var _po = '';
 var db_items = [];
 $(document).ready(function(){
+    hideField();
+
     $('#delivery_date').attr('readonly',false);
     $('textarea[name="qr_code"]').closest('.form-group').hide();
     $('input[name="supplier"]').closest('.form-group').hide();
@@ -107,8 +108,6 @@ $(document).ready(function(){
         _po = $this.val();
         // console.log(_po);
         getItemByPO(supplier,delivery_date,_po)
-        
-
     })
 
     if($('input[name="supplier"]').length && $('input[name="delivery_date"]').length){
@@ -136,8 +135,8 @@ $(document).ready(function(){
         var item_name   = $this.closest('tr').find('td.item_name').text();
         var qty         = $this.closest('tr').find('td.qty').text();
         var uom         = $this.closest('tr').find('td.uom').text();
-        // var rate        = $this.closest('tr').find('td.rate').text();
-        // var amount      = $this.closest('tr').find('td.amount').text();
+        var rate        = $this.closest('tr').find('td.rate').text();
+        var amount      = $this.closest('tr').find('td.amount').text();
         // console.log(_po)
         if($this.is(':checked')) {
             $('#panel-form-items').find('#itemspurchase_order').val(_po);
@@ -145,10 +144,13 @@ $(document).ready(function(){
             $('#panel-form-items').find('#itemsitem_name').val(item_name);
             $('#panel-form-items').find('#itemsqty').val(qty);
             $('#panel-form-items').find('#itemsuom').val(uom);
+            $('#panel-form-items').find('#itemsrate').val(rate);
+            $('#panel-form-items').find('#itemsamount').val(amount);
             $('#panel-form-items').find('#itemsbatch_no').val('-');
             $('#panel-form-items').find('#itemsserial_no').val('-');
             addToTableitems();
             setDBItems();
+            hideField();
         } else {
             $('table#table-items')
                 .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
@@ -160,7 +162,7 @@ $(document).ready(function(){
 
 function autoInputItem(items){
     $.each(items, function(k,v){
-        var rate = parseInt(v.last_purchase_rate);
+        var rate = parseInt(v.rate);
         var amount = rate * v.qty;
         $('#panel-form-items').find('#itemspurchase_order').val(v.purchase_order);
         $('#panel-form-items').find('#itemsitem_code').val(v.item_code);
@@ -191,8 +193,8 @@ function getItemByPO(supplier,delivery_date,po){
                             '<th>Item Name</th>'+
                             '<th>QTY</th>'+
                             '<th>UOM</th>'+
-                            // '<th>Rate</th>'+
-                            // '<th>Amount</th>'+
+                            '<th class="hidden">Rate</th>'+
+                            '<th class="hidden">Amount</th>'+
                         '</tr>'+
                     '</thead>'+
                     '<tbody><tr><td colspan="7"><center>loading...</center></td></tr>'+
@@ -212,7 +214,7 @@ function getItemByPO(supplier,delivery_date,po){
         $.each(data, function(k,v){
             var _id = (_po+'__'+v.item_code).trim().replace(/[_\W]+/g, "-");
             var _checked = ($.inArray(_id, db_items) != -1) ? 'checked' : '';
-            var _rate = parseInt(v.last_purchase_rate);
+            var _rate = parseInt(v.rate);
             var _amount = _rate * v.qty;
             _tr += '<tr>'+
             '<td class="pilih">'+
@@ -230,12 +232,12 @@ function getItemByPO(supplier,delivery_date,po){
             '<td class="uom">'+
                 '<span class="td-label">'+v.stock_uom+'</span>'+
             '</td>'+
-            // '<td class="rate">'+
-            //     '<span class="td-label">'+_rate+'</span>'+
-            // '</td>'+
-            // '<td class="amount">'+
-            //     '<span class="td-label">'+_amount+'</span>'+
-            // '</td>'+
+            '<td class="rate hidden">'+
+                '<span class="td-label">'+_rate+'</span>'+
+            '</td>'+
+            '<td class="amount hidden">'+
+                '<span class="td-label">'+_amount+'</span>'+
+            '</td>'+
         '</tr>';
         });
         // console.log(_tr)
@@ -291,4 +293,13 @@ function setDBItems(){
         i++;
     });
     // console.log(db_items)
+}
+
+function hideField(){
+    $(document).find('#itemsrate').closest('.form-group').hide();
+    $(document).find('#itemsamount').closest('.form-group').hide();
+    $('table#table-items').find('thead th:eq(7)').hide();
+    $('table#table-items').find('thead th:eq(8)').hide();
+    $('table#table-items').find('tbody td.rate').hide();
+    $('table#table-items').find('tbody td.amount').hide();
 }

@@ -57,9 +57,16 @@
 			// $this->form[] = ['label'=>'supplier_invoice_number','name'=>'supplier_invoice_number','type'=>'hidden','width'=>'col-sm-9'];
 			$this->form[] = ['label'=>'Supplier Invoice Number','name'=>'supplier_invoice_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			$this->form[] = ['label'=>'Due Date','name'=>'due_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-9'];
-			// $this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden','width'=>'col-sm-9'];
-			// $this->form[] = ['label'=>'Purchase Order Number','name'=>'purchase_order_number','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			$this->form[] = ['label'=>'File Invoice','name'=>'file_invoice','type'=>'upload','validation'=>'required|mimes:jpg,jpeg,png,pdf,doc,docx|max:2000','upload_encrypt'=>false,'width'=>'col-sm-9'];
+			
+
+			$this->form[] = ['label'=>'Get Items From','name'=>'get_item_from','type'=>'radio','dataenum'=>'poe|Purchase Order ERP;dnp|Delivery Note Portal'];
+			
+			// $this->form[] = ['label'=>'purchase_order_number','name'=>'purchase_order_number','type'=>'hidden','width'=>'col-sm-9'];
+			$this->form[] = ['label'=>'','name'=>'purchase_order_number','type'=>'select2','width'=>'col-sm-9'];
+
+			// $this->form[] = ['label'=>'delivery_note','name'=>'delivery_note','type'=>'hidden','width'=>'col-sm-9'];
+			// $this->form[] = ['label'=>'PO Number','name'=>'delivery_note','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-9'];
 			
 			$columns[]		= ['label'=>'PO Number','name'=>'purchase_order_number','type'=>'text','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Item Code','name'=>'item_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
@@ -199,7 +206,7 @@
 			$my_company = $this->my_company;
 			// pr($my_company);
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' && $user->company != $my_company){
-				$this->script_js .= '$(".box-footer div.form-group").find("div").append(\'<input type="submit" name="submit" value="Submit" class="btn btn-primary" />\');';
+				$this->script_js .= '$(".box-footer div.form-group").find("div").append(\'<input type="submit" name="submit" value="Submit" class="btn btn-primary hide" />\');';
 			}
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' && $user->company == $my_company){
 				$url = url('admin/purchase_invoices/generateinvoice/');
@@ -265,7 +272,8 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+			$this->style_css = NULL;
+			$this->style_css = "#form-group-purchase_order_number{display:none;}";
 	        
 	        
 	        
@@ -341,6 +349,8 @@
 	        //Your code here
 			$postdata['status'] = 'draft';
 			unset($postdata['id']);
+			unset($postdata['get_item_from']);
+			unset($postdata['purchase_order_number']);
 	    }
 
 	    /* 
@@ -367,6 +377,8 @@
 	    public function hook_before_edit(&$postdata,$id) {        
 			//Your code here
 			// pr($_POST,1);
+			unset($postdata['get_item_from']);
+			unset($postdata['purchase_order_number']);
 
 			$cek = DB::table('purchase_invoices')->where('id',$id)->first(['status']);
 			// pr($cek,1);
@@ -579,83 +591,122 @@
 	    //By the way, you can still create your own method in here... :)
 
 
-		public function sendEmail()
-			{
-				$q = DB::table('cms_users')
-				->where('company','BERDIKARI, CV')
-				->where('id_cms_privileges',4)
-				->first(['email','name']);
-				$config['to'] = $q->email;
-				$config['subject'] = 'Invoice telah di submit oleh supplier.';
-				$config['data'] = ['name' => $q->name,'subject'=>$config['subject'], 'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
-				$config['template'] = 'view.email.invoice';
-				$config['attachments'] = [];
-				// pr($config,1);
-				try{
-					\Mail::send('email.invoice', $config['data'], function ($message) use ($config)
-					{
-						$message->subject($config['subject']);
-						$message->from('donotreply@berdikari.com', 'Portal Berdikari');
-						$message->to($config['to']);
-					});
-					// pr('email send',1);
-					// return back()->with('alert-success','Berhasil Kirim Email');
-					return response (['status' => true,'success' => 'Berhasil Kirim Email']);
+		public function sendEmail(){
+			$q = DB::table('cms_users')
+			->where('company','BERDIKARI, CV')
+			->where('id_cms_privileges',4)
+			->first(['email','name']);
+			$config['to'] = $q->email;
+			$config['subject'] = 'Invoice telah di submit oleh supplier.';
+			$config['data'] = ['name' => $q->name,'subject'=>$config['subject'], 'pesan' => 'Pesan email','datetime'=>date('d M Y H:i:s')];
+			$config['template'] = 'view.email.invoice';
+			$config['attachments'] = [];
+			// pr($config,1);
+			try{
+				\Mail::send('email.invoice', $config['data'], function ($message) use ($config)
+				{
+					$message->subject($config['subject']);
+					$message->from('donotreply@berdikari.com', 'Portal Berdikari');
+					$message->to($config['to']);
+				});
+				// pr('email send',1);
+				// return back()->with('alert-success','Berhasil Kirim Email');
+				return response (['status' => true,'success' => 'Berhasil Kirim Email']);
+			}
+			catch (Exception $e){
+				return response (['status' => false,'errors' => $e->getMessage()]);
+				// pr($e->getMessage());
+			}
+		}
+
+		public function createPurchaseInvoice($id){
+			$data = DB::table('purchase_invoices')->find($id);
+			$doctype 		= 'Purchase Invoice';	
+
+			// {
+			// 	"doctype":"Purchase Invoice",
+			// 	"supplier": "Yamaha",
+			// 	"due_date":"2020-03-30",
+			// 	"bill_no":"1223456",
+			// 	"grand_total":150000,
+			// 	"items": [
+			// 			{
+			// 				"purchase_order": "PUR-ORD-2020-00003",
+			// 				"qty":1,
+			// 				"item_code": "1234-91-91"
+			// 			}
+			// 		]
+			// }
+			$query = [
+				'doctype' => $doctype,
+				'supplier' => $data->supplier,
+				'due_date' => $data->due_date,
+				'bill_no' => $data->supplier_invoice_number,
+				'items' => []
+			];
+			$pi_items = DB::table('purchase_invoice_items')
+				->where('id_purchase_invoice',$id)
+				->get(['item_code','purchase_order_number','qty']);
+			if($pi_items){
+				foreach($pi_items as $key => $val){
+					$query['items'][$key]['item_code'] = $val->item_code;
+					$query['items'][$key]['purchase_order'] = $val->purchase_order_number;
+					$query['items'][$key]['qty'] = $val->qty;
 				}
-				catch (Exception $e){
-					return response (['status' => false,'errors' => $e->getMessage()]);
-					// pr($e->getMessage());
+
+			}
+			$data = json_encode($query);
+			// $data='{"doctype":"Purchase Invoice","supplier": "Yamaha","due_date":"2020-03-30","bill_no":"1223456","items": [{"purchase_order": "PUR-ORD-2020-00003","qty":1,"item_code": "1234-91-91"}]}';
+			// pr($query,1);			
+			$_url 	= '/api/resource/'.$doctype;
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('POST', $this->_host.$_url, [
+				'query' => [
+					'data'=>$data
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+			return true;
+			// pr($data,1);
+		}
+
+		public function getPodn($supplier){
+			$q = DB::table('delivery_notes')
+				->select('delivery_note_items.purchase_order as name')
+				->where('supplier',$supplier)
+				->leftJoin('delivery_note_items','delivery_notes.id','=','delivery_note_id')
+				->groupBy('delivery_note_items.purchase_order')
+				->get();
+
+			return response()->json(['supplier'=>$supplier,'data'=>$q]);
+		}
+
+		public function getItems($po){
+			$data = DB::table('delivery_note_items')
+				->select('*')
+				->where('purchase_order',$po)
+				->get();
+
+			$po = [];
+			$datas = [];
+			if(count($data)){
+				foreach($data as $k => $val){
+					$po['po'][$val->purchase_order] = $val->purchase_order;
+					$po['item_code'][$val->item_code] = $val->item_code;
+				}
+				$items = getItemPO($po);
+
+				foreach($data as $k => $val){
+					$datas[$k] = $val;
+					$datas[$k]->qty = @$items[$val->purchase_order][$val->item_code]->qty; 
+					$datas[$k]->rate = @$items[$val->purchase_order][$val->item_code]->rate; 
 				}
 			}
+			
+			// pr($items);
+			// pr($data);
 
-			public function createPurchaseInvoice($id){
-				$data = DB::table('purchase_invoices')->find($id);
-				$doctype 		= 'Purchase Invoice';	
-
-				// {
-				// 	"doctype":"Purchase Invoice",
-				// 	"supplier": "Yamaha",
-				// 	"due_date":"2020-03-30",
-				// 	"bill_no":"1223456",
-				// 	"grand_total":150000,
-				// 	"items": [
-				// 			{
-				// 				"purchase_order": "PUR-ORD-2020-00003",
-				// 				"qty":1,
-				// 				"item_code": "1234-91-91"
-				// 			}
-				// 		]
-				// }
-				$query = [
-					'doctype' => $doctype,
-					'supplier' => $data->supplier,
-					'due_date' => $data->due_date,
-					'bill_no' => $data->supplier_invoice_number,
-					'items' => []
-				];
-				$pi_items = DB::table('purchase_invoice_items')
-					->where('id_purchase_invoice',$id)
-					->get(['item_code','purchase_order_number','qty']);
-				if($pi_items){
-					foreach($pi_items as $key => $val){
-						$query['items'][$key]['item_code'] = $val->item_code;
-						$query['items'][$key]['purchase_order'] = $val->purchase_order_number;
-						$query['items'][$key]['qty'] = $val->qty;
-					}
-
-				}
-				$data = json_encode($query);
-				// $data='{"doctype":"Purchase Invoice","supplier": "Yamaha","due_date":"2020-03-30","bill_no":"1223456","items": [{"purchase_order": "PUR-ORD-2020-00003","qty":1,"item_code": "1234-91-91"}]}';
-				// pr($query,1);			
-				$_url 	= '/api/resource/'.$doctype;
-				$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-				$res 	= $client->request('POST', $this->_host.$_url, [
-					'query' => [
-						'data'=>$data
-						]
-				]);
-				$data = json_decode($res->getBody()->getContents());
-				return true;
-				// pr($data,1);
-			}
+			return response()->json($data);
+		}
+			
 	}

@@ -373,7 +373,7 @@
 			$fields 		= "name, transaction_date, grand_total";
 			
 			
-			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data'.$params;
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
 			$res 	= $client->request('GET', $this->_host.$_url, [
 				'query' => [

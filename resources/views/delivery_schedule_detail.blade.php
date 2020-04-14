@@ -53,6 +53,7 @@
                                             <tbody>
                                                 @if($data->data)
                                                     @foreach($data->data as $key => $val)
+                                                    <?php $item = $items[$val->purchase_order][$val->item_code];?>
                                                         <tr>
                                                         <td class="">
                                                                 <span class="td-label">{{ $val->purchase_order }}</span>
@@ -64,16 +65,16 @@
                                                                 <span class="td-label">{{ $val->item_name }}</span>
                                                             </td>
                                                             <td class="">
-                                                                <span class="td-label right">{{ formatMoney($val->qty) }}</span>
+                                                                <span class="td-label right">{{ formatMoney($item->qty) }}</span>
                                                             </td>
                                                             <td class="">
-                                                                <span class="td-label">{{ ($val->stock_uom) }}</span>
+                                                                <span class="td-label">{{ ($item->stock_uom) }}</span>
                                                             </td>
                                                             <td class="">
-                                                                <span class="td-label right">{{ formatMoney($val->last_purchase_rate) }}</span>
+                                                                <span class="td-label right">{{ formatMoney($item->rate) }}</span>
                                                             </td>
                                                             <td class="">
-                                                                <span class="td-label right">{{ formatMoney($val->qty * $val->last_purchase_rate) }}</span>
+                                                                <span class="td-label right">{{ formatMoney($item->amount) }}</span>
                                                             </td>
                                                         </tr>
                                                     @endforeach
