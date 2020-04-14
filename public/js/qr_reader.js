@@ -4,8 +4,12 @@ class QrReader {
    *
    * @param element Modal Class/Id
    */
-  constructor(element) {
+  constructor(element, url, doctype) {
     this.modalElement = element;
+    this.url = url;
+    this.doctype = doctype;
+    this.previousQr = null;
+
     $(element).modal('show');
     self = this
     $(element).on('hide.bs.modal', function () {
@@ -14,35 +18,35 @@ class QrReader {
   }
 
   initQr() {
-    return new Promise(resolve => {
       this.video = document.getElementById("video");
       let canvasElement = document.getElementById("canvas");
       let canvas = canvasElement.getContext("2d");
 
-// Use facingMode: environment to attemt to get the front camera on phones
       self = this
-      navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}}).then(function (stream) {
-        self.video.srcObject = stream;
-        self.globalStream = stream;
-        self.video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-        self.video.play();
-        tick();
-      });
+      // Use facingMode: environment to attemt to get the front camera on phones
+      navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}})
+        .then(function (stream) {
+          self.video.srcObject = stream;
+          self.globalStream = stream;
+          self.video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+          self.video.play();
+          tick();
+        })
+        .catch(function (e) {
+          alert("Permission to use camera is denied, please allow the camera permission in the browser settings");
+          $(self.modalElement).modal('hide');
+        });
 
       /** Ticking */
       function tick() {;
         self.requestId = undefined;
         if (self.video.readyState == self.video.HAVE_ENOUGH_DATA) {
-          if (screen.height * 70 / 100 < self.video.videoHeight) {
-            canvasElement.height = screen.height * 70 / 100;
+          if (screen.height  < video.videoHeight || screen.width < video.videoWidth) {
+            canvasElement.height = video.videoHeight * 50/100;
+            canvasElement.width = video.videoWidth * 50/100;
           } else {
-            canvasElement.height = self.video.videoHeight;
-          }
-
-          if (screen.width * 80 / 100 < self.video.videoWidth) {
-            canvasElement.width = screen.width * 80 / 100;
-          } else {
-            canvasElement.width = self.video.videoWidth;
+            canvasElement.height = video.videoHeight;
+            canvasElement.width = video.videoWidth;
           }
 
           canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
@@ -52,12 +56,37 @@ class QrReader {
           });
 
           if (code) {
-            $(self.modalElement).modal('hide');
-            resolve(code.data);
-            return;
+            //$(self.modalElement).modal('hide');
+            checkQr(code.data);
           }
         }
         start();
+      }
+
+      function checkQr(qr) {
+        if(self.previousQr == qr) {
+          return;
+        }
+        self.previousQr = qr;
+
+        try {
+          var json = JSON.parse(qr);
+        }
+        catch {
+          alert("QR not valid.");
+          return;
+        }
+        if(json.doctype != self.doctype) {
+          alert("QR not valid.");
+        }
+        $.post(self.url, json, function (result) {
+          if(result == 'success') {
+            alert('Scan QR success')
+            window.location.href = window.location.href
+          } else {
+            alert('There is an error in the scan process')
+          }
+        })
       }
 
       function start() {
@@ -65,10 +94,9 @@ class QrReader {
           self.requestId = window.requestAnimationFrame(tick);
         }
       }
-    })
   };
 
-  onHide() {
+  onHide(){
     cancelAnimationFrame(this.requestId);
     this.requestId = null;
     if(this.globalStream) {

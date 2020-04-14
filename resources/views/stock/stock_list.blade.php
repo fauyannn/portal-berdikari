@@ -59,7 +59,7 @@
             {{ csrf_field() }}
             <div class="panel-heading">
                 <strong><i class="fa fa-star"></i>Stock Raw</strong>
-                <button type="button" style="margin-left: 20px" id="scanQr" class="btn-info btn-sm btn">Scan QR</button>
+                <button type="button" style="margin-left: 20px" id="scanQr" class="btn-info btn-sm btn"><i class="fa fa-camera" style="width: 20px"></i>Scan QR</button>
             </div>
             <div class="panel-body" style="padding:20px 0px 0px 0px">
                 <div class="box-body">
@@ -276,7 +276,7 @@
             </div>
         </div>
 
-        <input type="hidden" name="company" value="{{$company}}">
+        <input type="hidden" id="company" name="company" value="{{$company}}">
         @if(getUser()->id_cms_privileges <= 2)
             <a href="/admin/stocklist/select_company"><button type="button" class="btn bg-teal">Back</button></a>
         @endif
