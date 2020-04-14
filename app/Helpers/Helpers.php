@@ -46,7 +46,7 @@ function getItemPO(array $_filters){
     $filters['item_code']   = ['IN',implode(',',$_filters['item_code'])];
     $filters                = json_encode($filters);
 
-    $token = env('ERP_TOKEN');
+    $token = 'token ' . env('ERP_TOKEN');
     $host = env('ERP_URL');
     $_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
     $client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $token]]);

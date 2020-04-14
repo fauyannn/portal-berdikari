@@ -13,8 +13,8 @@
 
 		function __construct()
 		{
-			$this->_host = env('ERP_URL');;
-			$this->_token = env('ERP_TOKEN');;
+			$this->_host = env('ERP_URL');
+			$this->_token = 'token ' . env('ERP_TOKEN');
 		}
 
 	    public function cbInit() {
