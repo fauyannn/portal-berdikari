@@ -389,6 +389,8 @@
 			if($_POST['submit'] == 'Submit'){
 				$postdata['status'] = 'submited';
 			}
+			pr($postdata);
+			pr($_POST,1);
 	    }
 
 	    /* 
@@ -707,6 +709,33 @@
 			// pr($data);
 
 			return response()->json($data);
+		}
+
+		public function getRefreshitem($id){
+			$datas['po'] 			= explode('|||',$_GET['po']);
+			$datas['item_code'] 	= explode('|||',$_GET['item_code']);
+			$items = getItemPO($datas);
+
+			if(count($items)){
+				foreach($items as $po => $value){
+					foreach($value as $item_code => $val){
+						// pr($val);
+						DB::table('purchase_invoice_items')
+						->where('id_purchase_invoice',$id)
+						->where('purchase_order_number',$po)
+						->where('item_code',$item_code)
+						->update([
+							'qty' => $items[$po][$item_code]->qty,
+							'rate' => $items[$po][$item_code]->rate,
+							'amount' => $items[$po][$item_code]->amount,
+							'uom' => $items[$po][$item_code]->stock_uom,
+						]);
+					}
+				}
+			}
+
+			// pr($items);
+			return response()->json($items);
 		}
 			
 	}

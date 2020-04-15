@@ -30,12 +30,15 @@ $(document).ready(function(){
     $('#due_date').attr('readonly',false);
     var _id = $("input[name=\"id\"]").val()
     var _status = $('input[name="status"]').attr('value');
+
     if(_status != 'draft' && _id){
         $('form input[name="submit"]').attr('disabled',true).hide();
         $('form #table-items a').attr('disabled',true).remove();
         $('form input').attr('readonly',true);
         $('form #form-group-file_invoice').find('a.btn-delete').remove();
+        $('#form-group-get_item_from').hide();
     }
+    
     if(_status == 'submited'){
         $('input[name="generate_invoice"]').show();
     }
@@ -45,8 +48,12 @@ $(document).ready(function(){
     if(_status == 'closed'){
         $('input[name="reopen"]').show();
     }
-
     
+    //rate masih bisa berubah2 ketika status belum closed
+    if(_status != 'closed' && _id){
+        refreshItem();
+    }
+
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
         $('div.child-form-area').parent().css('display','block');
     })
@@ -420,4 +427,62 @@ $(document).ready(function(){
         });
     });
 });
+
+function refreshItem(){
+    console.log('refresh item');
+    var _id = $('input[name="id"]').val();
+    var po = [];
+
+    po['po']        = [];
+    po['item_code'] = [];
+    $('table#table-items tbody tr').each(function(k,v){
+
+        var val_po          = $(v).find('input[name="items-purchase_order_number[]"]').val();
+        var val_item_code   = $(v).find('input[name="items-item_code[]"]').val();
+
+        po['po'][k]             = val_po;
+        po['item_code'][k]      = val_item_code;
+    })
+
+    $.ajax({
+        type: "GET",
+        url: "/admin/purchase_invoices/refreshitem/"+_id,
+        dataType: "json",
+        data:  { 
+            po : po['po'].join('|||'),
+            item_code : po['item_code'].join('|||'),
+         },
+        success: function(res){
+            console.log(res)
+            $('table#table-items tbody tr').each(function(k,v){
+                var val_po   = $(v).find('input[name="items-purchase_order_number[]"]').val();
+                var val_ic   = $(v).find('input[name="items-item_code[]"]').val();
+
+                if(res[val_po]){
+                    var qty         = res[val_po][val_ic]['qty'];
+                    var rate        = res[val_po][val_ic]['rate'];
+                    var amount      = res[val_po][val_ic]['amount'];
+                    var uom         = res[val_po][val_ic]['stock_uom'];
+                    console.log(rate)
+                    $(v).find('td.qty').find('span').text(qty);
+                    $(v).find('td.rate').find('span').text(rate);
+                    $(v).find('td.amount').find('span').text(amount);
+                    $(v).find('td.uom').find('span').text(uom);
+
+                    $(v).find('td.qty').find('input').val(qty);
+                    $(v).find('td.rate').find('input').val(rate);
+                    $(v).find('td.amount').find('input').val(amount);
+                    $(v).find('td.uom').find('input').val(uom);
+                }
+            })
+        }
+    });
+    // $('input[name="items-purchase_order_number[]"]').each(function(k,v){
+    //     po[k] = $(v).val();
+    // })
+    // $('input[name="items-item_code[]"]').each(function(k,v){
+    //     item_code[k] = $(v).val();
+    // })
+
+}
 
