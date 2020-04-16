@@ -52,6 +52,7 @@
 			$this->form[] = ['label'=>'QR Code','name'=>'qr_code','type'=>'textarea'];
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-7'];
 			$this->form[] = ['label'=>'Supplier','name'=>'supplier','type'=>'text'];
+			$this->form[] = ['label'=>'Doc. Number','name'=>'document_number','type'=>'text','validation'=>'required','width'=>'col-sm-7'];
 			// $this->form[] = ['label'=>'date from ds','name'=>'delivery_date_from_ds','type'=>'hidden','readonly'=>true];
 			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required','width'=>'col-sm-7'];
 			
