@@ -7,18 +7,22 @@ $(document).ready(function(){
     $('textarea[name="qr_code"]').closest('.form-group').hide();
     $('input[name="supplier"]').closest('.form-group').hide();
     var img_qr = $('textarea[name="qr_code"]').val();
-    var html_qr = '<div class="qr_tag pull-right col-sm-2" style="position:absolute;right:30px;"><img src="'+img_qr+'" class="qr_code" style="width:90%;"/></div>';
+    var html_qr = '<div id="printableArea" class="qr_tag pull-right col-sm-2" style="position:absolute;right:30px;"><img src="'+img_qr+'" class="qr_code" style="width:90%;"/></div>';
+    var btn_print_qr = '<center><a class="btn btn-default" onclick="printDiv(\'printableArea\')">Print QR Code</a></center>';
     // $('textarea[name="qr_code"]').parent().append(html_qr);
     $('#parent-form-area').before(html_qr);
+    $('div.qr_tag').append(btn_print_qr);
     if($('table#table-detail').length){
         $('table#table-detail tr:eq(0)').find('td:eq(1)').hide();
         $('table#table-detail tr:eq(1)').hide();
         $('table#table-detail tr:eq(4)').find('td:first').text(' ');
 
         var img_qr = $('table#table-detail tr:eq(0)').find('td:eq(1)').text();
-        var html_qr = '<div class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:100px;"/></div>';
+        var html_qr = '<div id="printableArea" class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:100px;"/></div>';
         $('table#table-detail tr:eq(0)').find('td:eq(1)').show().html(html_qr);
-        $('img.qr_code:eq(0)').hide();
+        $('table#table-detail tr:eq(0) div.qr_tag').append(btn_print_qr);
+        $('div.qr_tag:eq(0) img').attr('src',img_qr);
+        $('div.qr_tag:eq(0)').hide();
     }
     
     // $('#btn_add_new_data').hide();
@@ -302,4 +306,18 @@ function hideField(){
     $('table#table-items').find('thead th:eq(8)').hide();
     $('table#table-items').find('tbody td.rate').hide();
     $('table#table-items').find('tbody td.amount').hide();
+}
+
+function printDiv(divName) {
+    var divToPrint=document.getElementById(divName);
+
+    var newWin=window.open('','Print-Window');
+    var cssPrint = '<style>a{display:none;} img{width:200px !important;}</style>';
+    newWin.document.open();
+  
+    newWin.document.write('<html>'+cssPrint+'<body onload="window.print()">'+divToPrint.innerHTML+'</body></html>');
+  
+    newWin.document.close();
+  
+    setTimeout(function(){newWin.close();},10);
 }
