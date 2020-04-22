@@ -235,7 +235,8 @@
 	        | $this->load_js[] = asset("myfile.js");
 	        |
 	        */
-	        $this->load_js = array();	        
+	        $this->load_js = array();
+	        $this->load_js[] = asset("js/myglobal.js");
 	        $this->load_js[] = asset("js/delivery-note.js");
 	        
 	        

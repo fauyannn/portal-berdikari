@@ -3,24 +3,42 @@ var db_items = [];
 $(document).ready(function(){
     hideField();
 
+    var qrsize = getCookie('qrsize');
+    if (!qrsize) {
+        setCookie('qrsize','200',9999);
+    }
+    qrsize = getCookie('qrsize');
+    $(document).on('keyup','input#qrsize',function(){
+        setCookie('qrsize',$(this).val(),9999);
+    })
+
     $('#delivery_date').attr('readonly',false);
     $('textarea[name="qr_code"]').closest('.form-group').hide();
     $('input[name="supplier"]').closest('.form-group').hide();
     var img_qr = $('textarea[name="qr_code"]').val();
-    var html_qr = '<div id="printableArea" class="qr_tag pull-right col-sm-2" style="position:absolute;right:30px;"><img src="'+img_qr+'" class="qr_code" style="width:90%;"/></div>';
-    var btn_print_qr = '<center><a class="btn btn-default" onclick="printDiv(\'printableArea\')">Print QR Code</a></center>';
+    var printQRSize = '<div class="input-group printHide" style="width:200px;">'+
+        '<input type="number" class="form-control" aria-label="Size" id="qrsize" name="qrsize" value="'+qrsize+'">'+
+        // '<span class="input-group-addon">px</span>'+
+        '<span class="input-group-btn">'+
+            '<button class="btn btn-default" onclick="printDiv(\'printableArea\')" type="button">Print QR Code</button>'+
+        '</span>'+        
+    '</div>';
+    // var fsize = '<input type="number" style="width:50px;" id="qrsize" name="qrsize" value="'+qrsize+'" />px';
+    var html_qr = '<div id="printableArea" class="qr_tag pull-right col-sm-2" style="position:absolute;right:30px;"><img src="'+img_qr+'" class="qr_code" style="width:200px;"/>'+printQRSize+'</div>';
+    // var btn_print_qr = '<center><a class="btn btn-default" onclick="printDiv(\'printableArea\')">Print QR Code</a></center>';
+    // var btn_print_qr = '<center>'+printQRSize+'</center>';
     // $('textarea[name="qr_code"]').parent().append(html_qr);
     $('#parent-form-area').before(html_qr);
-    $('div.qr_tag').append(btn_print_qr);
+    // $('div.qr_tag').append(btn_print_qr);
     if($('table#table-detail').length){
         $('table#table-detail tr:eq(0)').find('td:eq(1)').hide();
         $('table#table-detail tr:eq(1)').hide();
         $('table#table-detail tr:eq(4)').find('td:first').text(' ');
 
         var img_qr = $('table#table-detail tr:eq(0)').find('td:eq(1)').text();
-        var html_qr = '<div id="printableArea" class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:100px;"/></div>';
+        var html_qr = '<div id="printableArea" class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:200px;"/>'+printQRSize+'</div>';
         $('table#table-detail tr:eq(0)').find('td:eq(1)').show().html(html_qr);
-        $('table#table-detail tr:eq(0) div.qr_tag').append(btn_print_qr);
+        // $('table#table-detail tr:eq(0) div.qr_tag').append(btn_print_qr);
         $('div.qr_tag:eq(0) img').attr('src',img_qr);
         $('div.qr_tag:eq(0)').hide();
     }
@@ -312,7 +330,7 @@ function printDiv(divName) {
     var divToPrint=document.getElementById(divName);
 
     var newWin=window.open('','Print-Window');
-    var cssPrint = '<style>a{display:none;} img{width:200px !important;}</style>';
+    var cssPrint = '<style>a, .printHide{display:none;} img{width:'+getCookie('qrsize')+'px !important;}</style>';
     newWin.document.open();
   
     newWin.document.write('<html>'+cssPrint+'<body onload="window.print()">'+divToPrint.innerHTML+'</body></html>');
