@@ -38,7 +38,7 @@ $(document).ready(function(){
     if($('table#table-detail').length){
         $('table#table-detail tr:eq(0)').find('td:eq(1)').hide();
         $('table#table-detail tr:eq(1)').hide();
-        $('table#table-detail tr:eq(5)').find('td:first').text(' ');
+        $('table#table-detail tr:eq(6)').find('td:first').text(' ');
 
         var img_qr = $('table#table-detail tr:eq(0)').find('td:eq(1)').text();
         var html_qr = '<div id="printableArea" class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:200px;"/>'+printQRSize+'</div>';

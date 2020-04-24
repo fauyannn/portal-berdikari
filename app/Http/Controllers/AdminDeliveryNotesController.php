@@ -55,7 +55,7 @@
 			$this->form[] = ['label'=>'Doc. Number','name'=>'document_number','type'=>'text','validation'=>'required','width'=>'col-sm-7'];
 			// $this->form[] = ['label'=>'date from ds','name'=>'delivery_date_from_ds','type'=>'hidden','readonly'=>true];
 			$this->form[] = ['label'=>'Delivery Date','name'=>'delivery_date','type'=>'date','validation'=>'required','width'=>'col-sm-7'];
-			
+			$this->form[] = ['label'=>'File','name'=>'attachment','type'=>'upload','validation'=>'mimes:jpg,jpeg,png,pdf,doc,docx|max:2000','upload_encrypt'=>false,'width'=>'col-sm-7'];
 			$this->form[] = ['label'=>'Purchase Order','name'=>'purchase_order','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-7','dataenum'=>''];
 			
 			// $this->form[] = ['label'=>'Select items','name'=>'item_po','type'=>'hidden','width'=>'col-sm-9'];
