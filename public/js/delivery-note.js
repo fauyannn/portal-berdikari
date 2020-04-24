@@ -16,13 +16,18 @@ $(document).ready(function(){
     $('textarea[name="qr_code"]').closest('.form-group').hide();
     $('input[name="supplier"]').closest('.form-group').hide();
     var img_qr = $('textarea[name="qr_code"]').val();
+    
     var printQRSize = '<div class="input-group printHide" style="width:200px;">'+
-        '<input type="number" class="form-control" aria-label="Size" id="qrsize" name="qrsize" value="'+qrsize+'">'+
-        // '<span class="input-group-addon">px</span>'+
-        '<span class="input-group-btn">'+
-            '<button class="btn btn-default" onclick="printDiv(\'printableArea\')" type="button">Print QR Code</button>'+
-        '</span>'+        
-    '</div>';
+            '<input type="number" class="form-control" aria-label="Size" id="qrsize" name="qrsize" value="'+qrsize+'">'+
+            // '<span class="input-group-addon">px</span>'+
+            '<span class="input-group-btn">'+
+                '<button class="btn btn-default" onclick="printDiv(\'printableArea\')" type="button">Print QR Code</button>'+
+            '</span>'+        
+        '</div>';
+    if(!img_qr && !$('table#table-detail').length){
+        printQRSize = '';    
+    }
+    
     // var fsize = '<input type="number" style="width:50px;" id="qrsize" name="qrsize" value="'+qrsize+'" />px';
     var html_qr = '<div id="printableArea" class="qr_tag pull-right col-sm-2" style="position:absolute;right:30px;"><img src="'+img_qr+'" class="qr_code" style="width:200px;"/>'+printQRSize+'</div>';
     // var btn_print_qr = '<center><a class="btn btn-default" onclick="printDiv(\'printableArea\')">Print QR Code</a></center>';
@@ -33,7 +38,7 @@ $(document).ready(function(){
     if($('table#table-detail').length){
         $('table#table-detail tr:eq(0)').find('td:eq(1)').hide();
         $('table#table-detail tr:eq(1)').hide();
-        $('table#table-detail tr:eq(4)').find('td:first').text(' ');
+        $('table#table-detail tr:eq(5)').find('td:first').text(' ');
 
         var img_qr = $('table#table-detail tr:eq(0)').find('td:eq(1)').text();
         var html_qr = '<div id="printableArea" class="qr_tag pull-left col-sm-2" style="position:absolutes;right:15px;"><img src="'+img_qr+'" class="qr_code" style="width:200px;"/>'+printQRSize+'</div>';
