@@ -389,8 +389,8 @@
 			if($_POST['submit'] == 'Submit'){
 				$postdata['status'] = 'submited';
 			}
-			pr($postdata);
-			pr($_POST,1);
+			// pr($postdata);
+			// pr($_POST,1);
 	    }
 
 	    /* 
