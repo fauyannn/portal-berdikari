@@ -21,7 +21,65 @@ $(document).ready(function(){
         $('input[value="Submit"]').removeClass('hide');
     }
     $('form div.child-form-area').parent().css('display','none');
-    $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
+    // $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
+
+    var btnSave = '<a href="#panel-form-items" class="btn btn-success btn-xs btn-save"><i class="fa fa-check"></i></a>';
+    $('body').on('click','a[onclick="editRowitems(this)"]',function(){
+        // $('form div.child-form-area').parent().css('display','none');
+        var $this = $(this);
+        $this.parents('tr').find('textarea').show();
+        $this.parents('tr').find('td:last a.btn-warning').hide().before(btnSave);
+
+        // $('div.child-form-area').parent().css('display','block');
+        $this.parents('tr').find('input[name="items-qty[]"]').parent().find('span').hide();
+        $this.parents('tr').find('input[name="items-qty[]"]').attr('type','text').css('width','60px');
+        
+        // console.log()
+        $this.parents('tr').find('input').show();   
+        
+        changeFormat($this);     
+        setTimeout(function(){
+            $('form div.child-form-area').parent().css('display','none');
+        },5)
+    })
+
+    function changeFormat($this){
+        $parent = $this.parents('tr');
+        var qty = $parent.find('td.qty').html();
+            qty = qty.split('<');
+        if(qty.length == 2){
+            var newHtml = '<span class="td-label" style="display: none;">'+qty[0]+'</span>';
+                newHtml += '<'+qty[1];
+            $parent.find('td.qty').html(newHtml);
+        }       
+        
+        // console.log(qty);
+    }
+
+    $(document).on('click','a.btn-save',function(){
+        // $('input[type="submit"]').click();
+        var $this = $(this);
+        $this.parents('tr').find('input,textarea').hide();
+        $(this).parents('tr').find('span').show();
+        $(this).parents('tr').find('td:last a.btn-warning').show();
+        $(this).parents('tr').find('td:last a.btn-save').hide();
+    })
+
+    $('body').on('keyup','input[name="items-qty[]"]',function(){
+        var $this = $(this);
+        $this.parents('td').find('span').text($this.val());
+        var qty = $this.val();
+        $this.val(qty);
+        var rate = $this.parents('tr').find('td.rate input').val();
+        var amount = parseInt(qty) * parseInt(rate);
+
+        $this.parents('tr').find('td.amount span').text(amount);
+        $this.parents('tr').find('td.amount input').val(amount);
+        
+
+    })
+
+
     var status = $('input[name="status"]').val();
         status = status ? status : $.urlParam('status');
         status = labelStatus(status);
@@ -234,7 +292,7 @@ $(document).ready(function(){
             addToTableitems();
             setDBItems();
 
-            $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
+            // $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
         } else {
             $('table#table-items')
                 .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
