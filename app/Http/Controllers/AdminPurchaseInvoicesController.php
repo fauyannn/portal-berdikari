@@ -375,7 +375,7 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-			//Your code here
+			//Your code here			
 			// pr($_POST,1);
 			unset($postdata['get_item_from']);
 			unset($postdata['purchase_order_number']);
@@ -402,7 +402,7 @@
 	    */
 	    public function hook_after_edit($id) {
 			//Your code here 
-			$this->sendEmail();
+			// $this->sendEmail();
 			// pr($id);
 			// pr('hook_after_edit',1);
 
@@ -674,19 +674,25 @@
 
 		public function getPodn($supplier){
 			$q = DB::table('delivery_notes')
-				->select('delivery_note_items.purchase_order as name')
+				->select('document_number as name')
 				->where('supplier',$supplier)
-				->leftJoin('delivery_note_items','delivery_notes.id','=','delivery_note_id')
-				->groupBy('delivery_note_items.purchase_order')
+				// ->leftJoin('delivery_note_items','delivery_notes.id','=','delivery_note_id')
+				// ->groupBy('delivery_note_items.purchase_order')
 				->get();
 
 			return response()->json(['supplier'=>$supplier,'data'=>$q]);
 		}
 
-		public function getItems($po){
+		public function getItems($dn){
+
+			$q = DB::table('delivery_notes')
+					->select('id')
+					->where('document_number',$dn)
+					->first();
+			$delivery_note_id = $q->id;
 			$data = DB::table('delivery_note_items')
 				->select('*')
-				->where('purchase_order',$po)
+				->where('delivery_note_id',$delivery_note_id)
 				->get();
 
 			$po = [];

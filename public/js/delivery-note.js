@@ -203,7 +203,7 @@ $(document).ready(function(){
             html += '<td>'+
                         '<a href="#panel-form-items" onclick="editRowitems(this)" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i></a> '+
                         '<a href="javascript:void(0)" onclick="deleteRowitems(this)" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>'+
-                    '</td>';
+                    '</td></tr>';
         $('#table-items tbody tr:eq(0)').before(html);
         
         $('#table-items tbody').find('tr.not-yet-po').find('td.purchase_order').html('<span>'+_po+'</span><input type="hidden" name="items-purchase_order[]" value="'+_po+'">');

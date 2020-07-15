@@ -109,7 +109,7 @@ $(document).ready(function(){
     
     //rate masih bisa berubah2 ketika status belum closed
     if(_status != 'closed' && _id){
-        refreshItem();
+        // refreshItem();
     }
 
     $(document).on('click','a[onclick="editRowitems(this)"]',function(){
@@ -214,6 +214,7 @@ $(document).ready(function(){
                         '<thead>'+
                             '<tr>'+
                                 '<th></th>'+
+                                '<th>Purchase Order</th>'+
                                 '<th>Item Code</th>'+
                                 '<th>Item Name</th>'+
                                 '<th>QTY</th>'+
@@ -241,27 +242,33 @@ $(document).ready(function(){
                 var _checked = ($.inArray(_id, db_items) != -1) ? 'checked' : '';
                 var _rate = parseInt(v.rate);
                 var _amount = _rate * v.qty;
+                var mypo = (get_item_from == 'poe') ? _po : v.purchase_order;
+                var uom = (v.stock_uom ? v.stock_uom : v.uom);
                 _tr += '<tr>'+
                 '<td class="pilih">'+
-                    '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
+                    // '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
+                    '<a class="btn btn-primary pilih" id="'+v.item_code+'" >Add</a>'+
+                '</td>'+
+                '<td class="purchase_order_number">'+
+                    '<span class="td-label">'+mypo+'</span></span><input type="hidden" name="items-purchase_order_number[]" value="'+mypo+'">'+                                  
                 '</td>'+
                 '<td class="item_code">'+
-                    '<span class="td-label">'+v.item_code+'</span>'+                                  
+                    '<span class="td-label">'+v.item_code+'</span><input type="hidden" name="items-item_code[]" value="'+v.item_code+'">'+
                 '</td>'+
                 '<td class="item_name">'+
-                    '<span class="td-label">'+v.item_name+'</span>'+                                     
+                    '<span class="td-label">'+v.item_name+'</span><input type="hidden" name="items-item_name[]" value="'+v.item_name+'">'+                                     
                 '</td>'+
                 '<td class="qty">'+
-                    '<span class="td-label pull-right">'+v.qty+'</span>'+
+                    '<span class="td-label">'+v.qty+'</span><input type="hidden" name="items-qty[]" value="'+v.qty+'">'+
                 '</td>'+
                 '<td class="uom">'+
-                    '<span class="td-label">'+(v.stock_uom ? v.stock_uom : v.uom)+'</span>'+
+                    '<span class="td-label">'+uom+'</span><input type="hidden" name="items-uom[]" value="'+uom+'">'+
                 '</td>'+
                 '<td class="rate">'+
-                    '<span class="td-label pull-right">'+_rate+'</span>'+
+                    '<span class="td-label">'+_rate+'</span><input type="hidden" name="items-rate[]" value="'+_rate+'">'+
                 '</td>'+
                 '<td class="amount">'+
-                    '<span class="td-label pull-right">'+_amount+'</span>'+
+                    '<span class="td-label">'+_amount+'</span><input type="hidden" name="items-amount[]" value="'+_amount+'">'+
                 '</td>'+
             '</tr>';
             });
@@ -270,36 +277,63 @@ $(document).ready(function(){
         });
     }    
 
-    $(document).on('click','input.pilih',function(){
+    $(document).on('click','a.pilih',function(){
         var $this = $(this);
-        var item_code   = $this.closest('tr').find('td.item_code').text();
-        var item_name   = $this.closest('tr').find('td.item_name').text();
-        var qty         = $this.closest('tr').find('td.qty').text();
-        var uom         = $this.closest('tr').find('td.uom').text();
-        var rate        = $this.closest('tr').find('td.rate').text();
-        var amount      = $this.closest('tr').find('td.amount').text();
-        // console.log(_po)
-        if($this.is(':checked')) {
-            $('#panel-form-items').find('#itemspurchase_order_number').val(_po);
-            $('#panel-form-items').find('#itemsitem_code').val(item_code);
-            $('#panel-form-items').find('#itemsitem_name').val(item_name);
-            $('#panel-form-items').find('#itemsqty').val(qty);
-            $('#panel-form-items').find('#itemsuom').val(uom);
-            $('#panel-form-items').find('#itemsrate').val(rate);
-            $('#panel-form-items').find('#itemsamount').val(amount);
-            // $('#panel-form-items').find('#itemsbatch_no').val('-');
-            // $('#panel-form-items').find('#itemsserial_no').val('-');
-            addToTableitems();
-            setDBItems();
-
-            // $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
-        } else {
-            $('table#table-items')
-                .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
-                .remove();
-        }
+        // console.log($this.parents('tr').html());
+        var mypo = $this.parents('tr').find('td.purchase_order_number span').text();
+        var item_code = $this.parents('tr').find('td.item_code span').text();
+        var html = '<tr class="not-yet-po" id="'+mypo+'-'+item_code+'">';
+            html += $this.parents('tr').html();
+            // html += '<td class="batch_no"><span class="td-label">-</span><input type="hidden" name="items-batch_no[]" value="-"></td>';
+            // html += '<td class="serial_no"><span class="td-label">-</span><input type="hidden" name="items-serial_no[]" value="-"></td>';
+            html += '<td>'+
+                        '<a href="#panel-form-items" onclick="editRowitems(this)" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i></a> '+
+                        '<a href="javascript:void(0)" onclick="deleteRowitems(this)" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>'+
+                    '</td></tr>';
+        $('#table-items tbody tr:eq(0)').before(html);
         
-    });
+        // $('#table-items tbody').find('tr.not-yet-po').find('td.purchase_order_number').html('<span>'+mypo+'</span><input type="hidden" name="items-purchase_order_number[]" value="'+mypo+'">');
+
+        $('#table-items tbody').find('tr.not-yet-po').find('td.pilih').remove();
+        $('#table-items tbody').find('tr.not-yet-po').attr('class',mypo);
+
+
+    })
+    $(document).on('submit','form',function(){
+        $('table#table-items-po').remove();
+        $('.child-form-area').remove();
+        // alert('test');
+    })
+    // $(document).on('click','input.pilih',function(){
+    //     var $this = $(this);
+    //     var item_code   = $this.closest('tr').find('td.item_code').text();
+    //     var item_name   = $this.closest('tr').find('td.item_name').text();
+    //     var qty         = $this.closest('tr').find('td.qty').text();
+    //     var uom         = $this.closest('tr').find('td.uom').text();
+    //     var rate        = $this.closest('tr').find('td.rate').text();
+    //     var amount      = $this.closest('tr').find('td.amount').text();
+    //     // console.log(_po)
+    //     if($this.is(':checked')) {
+    //         $('#panel-form-items').find('#itemspurchase_order_number').val(_po);
+    //         $('#panel-form-items').find('#itemsitem_code').val(item_code);
+    //         $('#panel-form-items').find('#itemsitem_name').val(item_name);
+    //         $('#panel-form-items').find('#itemsqty').val(qty);
+    //         $('#panel-form-items').find('#itemsuom').val(uom);
+    //         $('#panel-form-items').find('#itemsrate').val(rate);
+    //         $('#panel-form-items').find('#itemsamount').val(amount);
+    //         // $('#panel-form-items').find('#itemsbatch_no').val('-');
+    //         // $('#panel-form-items').find('#itemsserial_no').val('-');
+    //         addToTableitems();
+    //         setDBItems();
+
+    //         // $('a[onclick="editRowitems(this)"], a[onclick="deleteRowitems(this)"]').parent().html('-');
+    //     } else {
+    //         $('table#table-items')
+    //             .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
+    //             .remove();
+    //     }
+        
+    // });
 
     // if ( $( "select#supplier_invoice_number").length ) {
     //     $('select#supplier_invoice_number').attr('id','my_supplier_invoice_number');
