@@ -402,7 +402,10 @@
 	    */
 	    public function hook_after_edit($id) {
 			//Your code here 
-			// $this->sendEmail();
+			$cek = DB::table('purchase_invoices')->where('id',$id)->first(['status']);
+			if($cek->status == 'submited'){
+				$this->sendEmail();
+			}
 			// pr($id);
 			// pr('hook_after_edit',1);
 
