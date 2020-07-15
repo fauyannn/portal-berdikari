@@ -50,9 +50,50 @@ $(document).ready(function(){
     
     // $('#btn_add_new_data').hide();
     $('div.child-form-area').parent().css('display','none');
-    $(document).on('click','a[onclick="editRowitems(this)"]',function(){
-        $('div.child-form-area').parent().css('display','block');
+    var btnSave = '<a href="#panel-form-items" class="btn btn-success btn-xs btn-save"><i class="fa fa-check"></i></a>';
+    $('body').on('click','a[onclick="editRowitems(this)"]',function(){
+        var $this = $(this);
+        $this.parents('tr').find('textarea').show();
+        $this.parents('tr').find('td:last a.btn-warning').hide().before(btnSave);
+
+        // $('div.child-form-area').parent().css('display','block');
+        $this.parents('tr').find('input[name="items-qty[]"]').parent().find('span').hide();
+        $this.parents('tr').find('input[name="items-qty[]"]').attr('type','text').css('width','60px');
+        
+        $this.parents('tr').find('input[name="items-batch_no[]"]').parent().find('span').hide();
+        $this.parents('tr').find('input[name="items-batch_no[]"]').attr('type','text').css('width','100px');
+
+        $this.parents('tr').find('input[name="items-serial_no[]"]').parent().find('span').hide();
+        $this.parents('tr').find('input[name="items-serial_no[]"]').attr('type','text').css('width','100px');
+
+        // console.log()
+        if($this.parents('tr').find('input[name="items-serial_no[]"]').length){
+            var elm = $this.parents('tr').find('input[name="items-serial_no[]"]');    
+            var val = elm.val();
+            var textarea_serial_no = '<textarea name="items-serial_no[]">'+val+'</textarea>';
+            elm.before(textarea_serial_no);
+            elm.remove();
+        }
+
+        $this.parents('tr').find('input').show();   
+        
+        changeFormat($this);     
     })
+    $(document).on('click','a.btn-save',function(){
+        // $('input[type="submit"]').click();
+        var $this = $(this);
+        $this.parents('tr').find('input,textarea').hide();
+        $(this).parents('tr').find('span').show();
+        $(this).parents('tr').find('td:last a.btn-warning').show();
+        $(this).parents('tr').find('td:last a.btn-save').hide();
+    })
+
+    $('body').on('keyup','#table-items input,#table-items textarea',function(){
+        var $this = $(this);
+        $this.parents('td').find('span').text($this.val());
+        $this.val($this.val());
+    })
+
     $(document).on('click','input#btn-add-table-items',function(){
         $('div.child-form-area').parent().css('display','none');
     })
@@ -67,9 +108,7 @@ $(document).ready(function(){
 
         var url_edit = $this.find('a.btn-edit').attr('href');
                        $this.find('a.btn-edit').attr('href',url_edit+'&idx='+val);
-
     })
-
 
     if ( $( "select#supplier").length ) {
         $('select#supplier').attr('id','my_supplier');
@@ -154,9 +193,25 @@ $(document).ready(function(){
         }
     }    
 
+    $(document).on('click','a.pilih',function(){
+        var $this = $(this);
+        // console.log($this.parents('tr').html());
+        var html = '<tr class="not-yet-po">';
+            html += $this.parents('tr').html();
+            html += '<td class="batch_no"><span class="td-label">-</span><input type="hidden" name="items-batch_no[]" value="-"></td>';
+            html += '<td class="serial_no"><span class="td-label">-</span><input type="hidden" name="items-serial_no[]" value="-"></td>';
+            html += '<td>'+
+                        '<a href="#panel-form-items" onclick="editRowitems(this)" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i></a> '+
+                        '<a href="javascript:void(0)" onclick="deleteRowitems(this)" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>'+
+                    '</td>';
+        $('#table-items tbody tr:eq(0)').before(html);
+        
+        $('#table-items tbody').find('tr.not-yet-po').find('td.purchase_order').html('<span>'+_po+'</span><input type="hidden" name="items-purchase_order[]" value="'+_po+'">');
+        $('#table-items tbody').find('tr.not-yet-po').attr('class',_po);
 
 
-    $(document).on('click','input.pilih',function(){
+    })
+    $(document).on('change','pilih',function(){
         var $this = $(this);
         var item_code   = $this.closest('tr').find('td.item_code').text();
         var item_name   = $this.closest('tr').find('td.item_name').text();
@@ -186,6 +241,35 @@ $(document).ready(function(){
         
     })
 });
+
+function changeFormat($this){
+    $parent = $this.parents('tr');
+    var qty = $parent.find('td.qty').html();
+        qty = qty.split('<');
+    if(qty.length == 2){
+        var newHtml = '<span class="td-label" style="display: none;">'+qty[0]+'</span>';
+            newHtml += '<'+qty[1];
+        $parent.find('td.qty').html(newHtml);
+    }       
+    
+    var batch_no = $parent.find('td.batch_no').html();
+        batch_no = batch_no.split('<');
+    if(batch_no.length == 2){
+        var newHtml = '<span class="td-label" style="display: none;">'+batch_no[0]+'</span>';
+            newHtml += '<'+batch_no[1];
+        $parent.find('td.batch_no').html(newHtml);
+    }       
+
+    var serial_no = $parent.find('td.serial_no').html();
+        serial_no = serial_no.split('<t');
+    if(serial_no.length == 2){
+        var newHtml = '<span class="td-label" style="display: none;">'+serial_no[0]+'</span>';
+            newHtml += '<t'+serial_no[1];
+        $parent.find('td.serial_no').html(newHtml);
+    }       
+
+    // console.log(qty);
+}
 
 function autoInputItem(items){
     $.each(items, function(k,v){
@@ -220,8 +304,8 @@ function getItemByPO(supplier,delivery_date,po){
                             '<th>Item Name</th>'+
                             '<th>QTY</th>'+
                             '<th>UOM</th>'+
-                            '<th class="hidden">Rate</th>'+
-                            '<th class="hidden">Amount</th>'+
+                            // '<th class="hidden">Rate</th>'+
+                            // '<th class="hidden">Amount</th>'+
                         '</tr>'+
                     '</thead>'+
                     '<tbody><tr><td colspan="7"><center>loading...</center></td></tr>'+
@@ -241,30 +325,32 @@ function getItemByPO(supplier,delivery_date,po){
         $.each(data, function(k,v){
             var _id = (_po+'__'+v.item_code).trim().replace(/[_\W]+/g, "-");
             var _checked = ($.inArray(_id, db_items) != -1) ? 'checked' : '';
+            var selected = ($.inArray(_id, db_items) != -1) ? 'selected' : '';
             var _rate = parseInt(v.rate);
             var _amount = _rate * v.qty;
-            _tr += '<tr>'+
-            '<td class="pilih">'+
-                '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
+            _tr += '<tr class="'+selected+'">'+
+            '<td class="pilih purchase_order">'+
+                // '<input type="checkbox" class="pilih" id="'+v.item_code+'" '+_checked+'></input>'+
+                '<a class="btn btn-primary pilih" id="'+v.item_code+'" >Add</a>'+
             '</td>'+
             '<td class="item_code">'+
-                '<span class="td-label">'+v.item_code+'</span>'+                                  
+                '<span class="td-label">'+v.item_code+'</span><input type="hidden" name="items-item_code[]" value="'+v.item_code+'">'+                                  
             '</td>'+
             '<td class="item_name">'+
-                '<span class="td-label">'+v.item_name+'</span>'+                                     
+                '<span class="td-label">'+v.item_name+'</span><input type="hidden" name="items-item_name[]" value="'+v.item_name+'">'+                                     
             '</td>'+
             '<td class="qty">'+
-                '<span class="td-label">'+v.qty+'</span>'+
+                '<span class="td-label">'+v.qty+'</span><input type="hidden" name="items-qty[]" value="'+v.qty+'">'+
             '</td>'+
             '<td class="uom">'+
-                '<span class="td-label">'+v.stock_uom+'</span>'+
+                '<span class="td-label">'+v.stock_uom+'</span><input type="hidden" name="items-uom[]" value="'+v.stock_uom+'">'+
             '</td>'+
-            '<td class="rate hidden">'+
-                '<span class="td-label">'+_rate+'</span>'+
-            '</td>'+
-            '<td class="amount hidden">'+
-                '<span class="td-label">'+_amount+'</span>'+
-            '</td>'+
+            // '<td class="rate hidden">'+
+            //     '<span class="td-label">'+_rate+'</span>'+
+            // '</td>'+
+            // '<td class="amount hidden">'+
+            //     '<span class="td-label">'+_amount+'</span>'+
+            // '</td>'+
         '</tr>';
         });
         // console.log(_tr)

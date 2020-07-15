@@ -248,7 +248,7 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "tr.selected{background-color: lightskyblue !important;}";
 	        
 	        
 	        
