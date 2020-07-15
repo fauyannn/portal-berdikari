@@ -10,18 +10,19 @@
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "name";
+
+			$this->title_field = "company";
 			$this->limit = "20";
-			$this->orderby = "id,desc";
+			$this->orderby = "company,asc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
-			$this->button_show = true;
+			$this->button_add = false;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
+			$this->button_show = false;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
@@ -206,8 +207,8 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
-	        
+
+            $this->addaction[] = ['label'=>'View','url'=>CRUDBooster::adminPath('users?filter_column[cms_users.company][type]=%3D&filter_column[cms_users.company][value]=[company]'),'icon'=>'fa fa-eye','color'=>'success'];
 	    }
 
 
@@ -233,11 +234,8 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			//Your code here
-			// $query->select('*');
-			// $query->groupBy('cms_users.company');
-			// return $query;
-			// dd($query->toSql());
+	        $query = DB::table($this->table)->select("company");
+            $query->groupBy('company');
 	            
 	    }
 
