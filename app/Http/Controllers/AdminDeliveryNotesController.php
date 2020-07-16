@@ -343,16 +343,44 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 			//Your code here
+
+			$new = [];
+			foreach($_POST['items-qty'] as $k => $val){
+				if($val){
+					$new[$k] = $val;
+				} else{
+					$new[$k] = 1;
+				}
+			}
+			Request::merge(['items-qty'=>$new]);
+
+			$new = [];
+			foreach($_POST['items-batch_no'] as $k => $val){
+				if($val){
+					$new[$k] = $val;
+				} else{
+					$new[$k] = '-';
+				}
+			}
+			Request::merge(['items-batch_no'=>$new]);
+
+			$new = [];
 			foreach($_POST['items-serial_no'] as $k => $val){
 				$exp = explode("\r\n",$val);
 				if(is_array($exp)){
 					$imp = implode("|||",$exp);
 					$_POST['items-serial_no'][$k] = $imp;
 				}
-				// pr($k);
+				if($val){
+					$new[$k] = $val;
+				} else{
+					$new[$k] = '-';
+				}
 			}
+			Request::merge(['items-serial_no'=>$new]);
+			
 			// pr($postdata);
-			// pr($_POST,1);
+			// pr(Request::all(),1);
 	    }
 
 	    /* 

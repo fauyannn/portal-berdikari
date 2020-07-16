@@ -54,6 +54,7 @@ $(document).ready(function(){
     $('body').on('click','a[onclick="editRowitems(this)"]',function(){
         var $this = $(this);
         var no = $this.parents('tr').data('no');
+        $this.parents('tr').find('td.serial_no').find('span').hide();
         $this.parents('tr').find('textarea').show();
         $this.parents('tr').find('td:last a.btn-warning').hide().before(btnSave);
 
@@ -66,18 +67,19 @@ $(document).ready(function(){
 
         $this.parents('tr').find('input[name="items-serial_no[]"]').parent().find('span').hide();
         $this.parents('tr').find('input[name="items-serial_no[]"]').attr('type','text').css('width','100px');
-        var textarea_serial_no = '';
+        // var textarea_serial_no = '';
         // console.log()
         if($this.parents('tr').find('input[name="items-serial_no[]"]').length){
             var elm = $this.parents('tr').find('input[name="items-serial_no[]"]');    
-            var val = elm.val();
-            var textarea_serial_no = '<textarea name="items-serial_no[]">'+val+'</textarea>';
+            // var val = elm.val();
+            var val = elm.parents('tr').find('td.serial_no').find('span').text();
+            var textarea_serial_no = '<textarea name="items-serial_no[]" placeholder="SN0001,SN0002,...">'+val+'</textarea>';
             // textarea_serial_no = '<select class="select2-child form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
             elm.before(textarea_serial_no);
             elm.remove();
-            $(".select2-child").select2({
-                tags: true
-            });
+            // $(".select2-child").select2({
+            //     tags: true
+            // });
         }
 
         $this.parents('tr').find('input').show();   
@@ -96,7 +98,7 @@ $(document).ready(function(){
     $('body').on('keyup','#table-items input[name="items-qty[]"],#table-items input[name="items-batch_no[]"],textarea[name="items-serial_no[]"]',function(){
         var $this = $(this);
         $this.parents('td').find('span').text($this.val());
-        // $this.val($this.val());
+        $this.val($this.val());
     })
 
     $(document).on('click','input#btn-add-table-items',function(){
@@ -285,8 +287,11 @@ function changeFormat($this){
     }       
 
     var serial_no = $parent.find('td.serial_no').html();
+    var cek = serial_no.split('<');    
+        
         serial_no = serial_no.split('<t');
-    if(serial_no.length == 2){
+    
+    if(cek.length == 3){
         var newHtml = '<span class="td-label" style="display: none;">'+serial_no[0]+'</span>';
             newHtml += '<t'+serial_no[1];
         $parent.find('td.serial_no').html(newHtml);
@@ -364,7 +369,7 @@ function getItemByPO(supplier,delivery_date,po){
                 '<span class="td-label">'+v.item_name+'</span><input type="hidden" name="items-item_name[]" value="'+v.item_name+'">'+                                     
             '</td>'+
             '<td class="qty">'+
-                '<span class="td-label">'+v.qty+'</span><input type="hidden" name="items-qty[]" value="'+v.qty+'">'+
+                '<span class="td-label">'+v.qty+'</span><input type="hidden" name="items-qty[]" value="'+v.qty+'" required="required">'+
             '</td>'+
             '<td class="uom">'+
                 '<span class="td-label">'+v.stock_uom+'</span><input type="hidden" name="items-uom[]" value="'+v.stock_uom+'">'+
