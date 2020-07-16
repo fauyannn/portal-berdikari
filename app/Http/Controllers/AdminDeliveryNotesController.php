@@ -342,8 +342,17 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
-
+			//Your code here
+			foreach($_POST['items-serial_no'] as $k => $val){
+				$exp = explode("\r\n",$val);
+				if(is_array($exp)){
+					$imp = implode("|||",$exp);
+					$_POST['items-serial_no'][$k] = $imp;
+				}
+				// pr($k);
+			}
+			// pr($postdata);
+			// pr($_POST,1);
 	    }
 
 	    /* 

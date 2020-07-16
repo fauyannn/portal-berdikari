@@ -53,6 +53,7 @@ $(document).ready(function(){
     var btnSave = '<a href="#panel-form-items" class="btn btn-success btn-xs btn-save"><i class="fa fa-check"></i></a>';
     $('body').on('click','a[onclick="editRowitems(this)"]',function(){
         var $this = $(this);
+        var no = $this.parents('tr').data('no');
         $this.parents('tr').find('textarea').show();
         $this.parents('tr').find('td:last a.btn-warning').hide().before(btnSave);
 
@@ -65,14 +66,18 @@ $(document).ready(function(){
 
         $this.parents('tr').find('input[name="items-serial_no[]"]').parent().find('span').hide();
         $this.parents('tr').find('input[name="items-serial_no[]"]').attr('type','text').css('width','100px');
-
+        var textarea_serial_no = '';
         // console.log()
         if($this.parents('tr').find('input[name="items-serial_no[]"]').length){
             var elm = $this.parents('tr').find('input[name="items-serial_no[]"]');    
             var val = elm.val();
             var textarea_serial_no = '<textarea name="items-serial_no[]">'+val+'</textarea>';
+            // textarea_serial_no = '<select class="select2-child form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
             elm.before(textarea_serial_no);
             elm.remove();
+            $(".select2-child").select2({
+                tags: true
+            });
         }
 
         $this.parents('tr').find('input').show();   
@@ -88,10 +93,10 @@ $(document).ready(function(){
         $(this).parents('tr').find('td:last a.btn-save').hide();
     })
 
-    $('body').on('keyup','#table-items input,#table-items textarea',function(){
+    $('body').on('keyup','#table-items input[name="items-qty[]"],#table-items input[name="items-batch_no[]"],textarea[name="items-serial_no[]"]',function(){
         var $this = $(this);
         $this.parents('td').find('span').text($this.val());
-        $this.val($this.val());
+        // $this.val($this.val());
     })
 
     $(document).on('click','input#btn-add-table-items',function(){
@@ -209,39 +214,58 @@ $(document).ready(function(){
         $('#table-items tbody').find('tr.not-yet-po').find('td.purchase_order').html('<span>'+_po+'</span><input type="hidden" name="items-purchase_order[]" value="'+_po+'">');
         $('#table-items tbody').find('tr.not-yet-po').attr('class',_po);
 
-
+        numberingChildTable();
     })
-    $(document).on('change','pilih',function(){
-        var $this = $(this);
-        var item_code   = $this.closest('tr').find('td.item_code').text();
-        var item_name   = $this.closest('tr').find('td.item_name').text();
-        var qty         = $this.closest('tr').find('td.qty').text();
-        var uom         = $this.closest('tr').find('td.uom').text();
-        var rate        = $this.closest('tr').find('td.rate').text();
-        var amount      = $this.closest('tr').find('td.amount').text();
-        // console.log(_po)
-        if($this.is(':checked')) {
-            $('#panel-form-items').find('#itemspurchase_order').val(_po);
-            $('#panel-form-items').find('#itemsitem_code').val(item_code);
-            $('#panel-form-items').find('#itemsitem_name').val(item_name);
-            $('#panel-form-items').find('#itemsqty').val(qty);
-            $('#panel-form-items').find('#itemsuom').val(uom);
-            $('#panel-form-items').find('#itemsrate').val(rate);
-            $('#panel-form-items').find('#itemsamount').val(amount);
-            $('#panel-form-items').find('#itemsbatch_no').val('-');
-            $('#panel-form-items').find('#itemsserial_no').val('-');
-            addToTableitems();
-            setDBItems();
-            hideField();
-        } else {
-            $('table#table-items')
-                .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
-                .remove();
-        }
+    // $(document).on('change','pilih',function(){
+    //     var $this = $(this);
+    //     var item_code   = $this.closest('tr').find('td.item_code').text();
+    //     var item_name   = $this.closest('tr').find('td.item_name').text();
+    //     var qty         = $this.closest('tr').find('td.qty').text();
+    //     var uom         = $this.closest('tr').find('td.uom').text();
+    //     var rate        = $this.closest('tr').find('td.rate').text();
+    //     var amount      = $this.closest('tr').find('td.amount').text();
+    //     // console.log(_po)
+    //     if($this.is(':checked')) {
+    //         $('#panel-form-items').find('#itemspurchase_order').val(_po);
+    //         $('#panel-form-items').find('#itemsitem_code').val(item_code);
+    //         $('#panel-form-items').find('#itemsitem_name').val(item_name);
+    //         $('#panel-form-items').find('#itemsqty').val(qty);
+    //         $('#panel-form-items').find('#itemsuom').val(uom);
+    //         $('#panel-form-items').find('#itemsrate').val(rate);
+    //         $('#panel-form-items').find('#itemsamount').val(amount);
+    //         $('#panel-form-items').find('#itemsbatch_no').val('-');
+    //         $('#panel-form-items').find('#itemsserial_no').val('-');
+    //         addToTableitems();
+    //         setDBItems();
+    //         hideField();
+    //     } else {
+    //         $('table#table-items')
+    //             .find('tr#'+(_po+'__'+item_code).trim().replace(/[_\W]+/g, "-"))
+    //             .remove();
+    //     }
         
-    })
-});
+    // })
 
+    $(document).on('submit','form',function(){
+        $('table#table-items-po').remove();
+        $('.child-form-area').remove();
+        // alert('test');
+    })
+    $(".select2-child").select2({
+        tags: true
+      });
+
+      numberingChildTable();
+});
+function numberingChildTable(){
+    var no = 0;
+    $('table#table-items tbody tr').each(function(){
+        var $this = $(this);
+        $this.attr('data-no',no);
+        console.log(no);
+        no++;
+    })
+}
 function changeFormat($this){
     $parent = $this.parents('tr');
     var qty = $parent.find('td.qty').html();
