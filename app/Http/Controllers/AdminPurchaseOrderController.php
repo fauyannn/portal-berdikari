@@ -14,9 +14,8 @@
 
 		function __construct()
 		{
-			$env = env_api();
-			$this->_host = $env['host'];
-			$this->_token = $env['token'];
+			$this->_host = env('ERP_URL');
+			$this->_token = 'token ' . env('ERP_TOKEN');
 		}
 
 	    public function cbInit() {
