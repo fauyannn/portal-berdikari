@@ -367,18 +367,18 @@
 			foreach($_POST['items-serial_no'] as $k => $val){
 				$exp = explode("\r\n",$val);
 				if(is_array($exp)){
-					$imp = implode("|||",$exp);
+					$imp = implode(",",$exp);
 					$_POST['items-serial_no'][$k] = $imp;
 				}
 				if($val){
-					$new[$k] = $val;
+					$new[$k] = $imp;
 				} else{
 					$new[$k] = '-';
 				}
 			}
 			Request::merge(['items-serial_no'=>$new]);
 			
-			// pr($postdata);
+			// pr($_POST);
 			// pr(Request::all(),1);
 	    }
 

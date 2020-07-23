@@ -72,14 +72,12 @@ $(document).ready(function(){
         if($this.parents('tr').find('input[name="items-serial_no[]"]').length){
             var elm = $this.parents('tr').find('input[name="items-serial_no[]"]');    
             // var val = elm.val();
-            var val = elm.parents('tr').find('td.serial_no').find('span').text();
-            var textarea_serial_no = '<textarea name="items-serial_no[]" placeholder="SN0001,SN0002,...">'+val+'</textarea>';
-            // textarea_serial_no = '<select class="select2-child form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
+            var val = elm.parents('tr').find('td.serial_no').find('span').html().split('<br>').join("\n");
+            var textarea_serial_no = '<textarea name="items-serial_no[]" placeholder="">'+val+'</textarea>';
+            // textarea_serial_no = '<select class="myselect2 form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
             elm.before(textarea_serial_no);
             elm.remove();
-            // $(".select2-child").select2({
-            //     tags: true
-            // });
+            setSelect2(1);
         }
 
         $this.parents('tr').find('input').show();   
@@ -89,6 +87,9 @@ $(document).ready(function(){
     $(document).on('click','a.btn-save',function(){
         // $('input[type="submit"]').click();
         var $this = $(this);
+        var serial_no = $this.parents('tr').find('td.serial_no').find('textarea').val();
+        var seial_no_html = serial_no.split("\n").join("<br>");
+        $this.parents('tr').find('td.serial_no').find('span').html(seial_no_html);
         $this.parents('tr').find('input,textarea').hide();
         $(this).parents('tr').find('span').show();
         $(this).parents('tr').find('td:last a.btn-warning').show();
@@ -253,18 +254,46 @@ $(document).ready(function(){
         $('.child-form-area').remove();
         // alert('test');
     })
-    $(".select2-child").select2({
-        tags: true
-      });
 
-      numberingChildTable();
+    var serial_no = '';
+    $('table#table-detail tbody').find('table#table-detail tbody tr').each(function(){
+        var $this = $(this);
+            
+        serial_no = $($this).find('td.serial_no').find('span').html();
+        if(serial_no){
+            console.log(serial_no);  
+            serial_no = serial_no.trim();
+            serial_no = serial_no.split(",").join("<br>");
+            $($this).find('td.serial_no').find('span').html(serial_no);
+        }     
+            
+    })
+
+    numberingChildTable();
 });
+
+function setSelect2(val){
+    $(".myselect2").select2({
+        tags: true
+    });
+}
+
 function numberingChildTable(){
     var no = 0;
     $('table#table-items tbody tr').each(function(){
         var $this = $(this);
         $this.attr('data-no',no);
-        console.log(no);
+        
+        var serial_no = $($this).find('td.serial_no').find('span').html();
+            if(serial_no){
+                console.log('1 : '+serial_no);  
+                serial_no = serial_no.trim();
+                serial_no = serial_no.split(",").join("<br>");
+                serial_no = serial_no.split("\n").join("<br>");
+                $($this).find('td.serial_no').find('span').html(serial_no);
+                console.log('2 : '+serial_no);
+            }     
+            
         no++;
     })
 }
@@ -459,3 +488,4 @@ function printDiv(divName) {
   
     setTimeout(function(){newWin.close();},10);
 }
+
