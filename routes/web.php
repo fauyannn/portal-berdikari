@@ -24,3 +24,9 @@ Route::prefix('admin/stocklist')->group(function (){
     Route::post('/processqr/company/{company?}', 'AdminStockListController@processQr');
     Route::get('/select_company', 'AdminStockListController@selectCompany');
 });
+
+Route::prefix('admin/trouble_report')->group(function (){
+    Route::get('/', 'AdminTroubleReportController@index');
+    Route::get('/{name}', 'AdminTroubleReportController@detail');
+    Route::post('/{name}', 'AdminTroubleReportController@detail');
+});
