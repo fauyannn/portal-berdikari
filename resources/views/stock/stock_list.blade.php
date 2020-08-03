@@ -209,7 +209,7 @@
             </table>
 
             <div class="panel-heading">
-                <strong><i class="fa fa-star"></i>Stock NG</strong>
+                <strong><i class="fa fa-star"></i>Stock FG</strong>
             </div>
             <div class="panel-body" style="padding:20px 0px 0px 0px">
                 <div class="box-body" id="parent-form-area">
