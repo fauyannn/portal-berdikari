@@ -40,8 +40,11 @@ class AdminStockListController extends Controller
         $wips = Stock::where('supplier', $company)
             ->where('type', 2)->get();
 
-        $others = Stock::where('supplier', $company)
+        $fgs = Stock::where('supplier', $company)
             ->where('type', 3)->get();
+
+        $ngs = Stock::where('supplier', $company)
+            ->where('type', 4)->get();
 
         return view('stock.stock_list', [
             'items' => $items->data,
@@ -54,7 +57,8 @@ class AdminStockListController extends Controller
             'load_css' => [asset('vendor/crudbooster/assets/select2/dist/css/select2.min.css')],
             'raws' => $raws,
             'wips' => $wips,
-            'others' => $others,
+            'fgs' => $fgs,
+            'ngs' => $ngs,
             'company' => $company
         ]);
     }
@@ -70,7 +74,8 @@ class AdminStockListController extends Controller
         }
         $this->saveStocks($request->input('raw'), 1, $company);
         $this->saveStocks($request->input('wip'), 2, $company);
-        $this->saveStocks($request->input('other'), 3, $company);
+        $this->saveStocks($request->input('fg'), 3, $company);
+        $this->saveStocks($request->input('ng'), 4, $company);
 
         if(getUser()->id_cms_privileges > 2) {
             return redirect('admin/stocklist');
