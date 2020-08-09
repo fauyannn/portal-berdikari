@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddBatchnoSerialnoColumnInDeliveryNoteItemsTable extends Migration
+class AddColumnBatchNoBdkInDeliveryNoteItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,7 @@ class AddBatchnoSerialnoColumnInDeliveryNoteItemsTable extends Migration
     public function up()
     {
         Schema::table('delivery_note_items', function (Blueprint $table) {
-            $table->string('batch_no',100)->nullable()->after('amount');
-            $table->string('serial_no',225)->nullable()->after('batch_no');
+            $table->string('batch_no_bdk')->nullable()->after('serial_no');  
         });
     }
 
@@ -27,8 +26,7 @@ class AddBatchnoSerialnoColumnInDeliveryNoteItemsTable extends Migration
     public function down()
     {
         Schema::table('delivery_note_items', function (Blueprint $table) {
-            $table->dropColumn('serial_no');
-            $table->dropColumn('batch_no');
+            $table->dropColumn('batch_no_bdk');
         });
     }
 }

@@ -54,7 +54,9 @@ $(document).ready(function(){
     $('body').on('click','a[onclick="editRowitems(this)"]',function(){
         var $this = $(this);
         var no = $this.parents('tr').data('no');
+        $this.parents('tr').addClass('active');
         $this.parents('tr').find('td.serial_no').find('span').hide();
+        $this.parents('tr').find('td.batch_no_bdk').find('span').hide();
         $this.parents('tr').find('textarea').show();
         $this.parents('tr').find('td:last a.btn-warning').hide().before(btnSave);
 
@@ -67,6 +69,10 @@ $(document).ready(function(){
 
         $this.parents('tr').find('input[name="items-serial_no[]"]').parent().find('span').hide();
         $this.parents('tr').find('input[name="items-serial_no[]"]').attr('type','text').css('width','100px');
+
+        $this.parents('tr').find('select[name="items-batch_no_bdk_2[]"]').parent().find('span').hide();
+        // $this.parents('tr').find('select[name="items-batch_no_bdk_2[]"]').removeClass('hidden').css('width','100px');
+
         // var textarea_serial_no = '';
         // console.log()
         if($this.parents('tr').find('input[name="items-serial_no[]"]').length){
@@ -77,8 +83,34 @@ $(document).ready(function(){
             // textarea_serial_no = '<select class="myselect2 form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
             elm.before(textarea_serial_no);
             elm.remove();
-            setSelect2(1);
+            // setSelect2(1);
         }
+        if($this.parents('tr').find('[name="items-batch_no_bdk[]"]').length){
+            var elm = $this.parents('tr').find('[name="items-batch_no_bdk[]"]');    
+            // var val = elm.val();
+            var field_batch_no_bdk = '<select class="hidden myselect2" name="items-batch_no_bdk_2[]" multiple="multiple"><option value=""></option></select>';
+            // textarea_serial_no = '<select class="myselect2 form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
+            if(!$this.parents('tr').find('select.myselect2').length){
+                elm.before(field_batch_no_bdk);
+            }
+            
+            
+            $this.parents('tr').find('td.batch_no_bdk').find('span.select2').remove();
+            
+            elm.prop('name','items-batch_no_bdk[]');
+            // $this.parents('tr').find('td.batch_no_bdk').find('[name="items-batch_no_bdk[]"]'); 
+            setSelect2(1);
+            $this.parents('table').find('span.select2').hide();
+            $this.parents('table').find('tr.active').find('span.select2').show();
+            $this.parents('tr').find('td.batch_no_bdk').find('span.select2').show();
+
+            var po = $this.parents('tr').find('[name="items-purchase_order[]"]').val();
+            var item = $this.parents('tr').find('[name="items-item_code[]"]').val();
+            var datas = $this.parents('tr').find('.batch_no_bdk span').html();
+            console.log(datas)
+            getbatchNoBDK(po, item, $this,datas);
+        }
+
 
         $this.parents('tr').find('input').show();   
         
@@ -90,10 +122,23 @@ $(document).ready(function(){
         var serial_no = $this.parents('tr').find('td.serial_no').find('textarea').val();
         var seial_no_html = serial_no.split("\n").join("<br>");
         $this.parents('tr').find('td.serial_no').find('span').html(seial_no_html);
+
+        var batch_no_bdk = $this.parents('tr').find('td.batch_no_bdk').find('[name="items-batch_no_bdk[]"]').val();
+        var batch_no_bdk_html = batch_no_bdk.split("|||").join("<br>");
+        console.log(batch_no_bdk)
+        $this.parents('tr').find('td.batch_no_bdk').find('span').html(batch_no_bdk_html);
+
+        $this.parents('tr').removeClass('active');
+
         $this.parents('tr').find('input,textarea').hide();
+        $this.parents('tr').find('select').addClass('hidden');
         $(this).parents('tr').find('span').show();
         $(this).parents('tr').find('td:last a.btn-warning').show();
         $(this).parents('tr').find('td:last a.btn-save').hide();
+
+        setTimeout(function(){
+            $this.parents('tr').find('td.batch_no_bdk').find('span.select2').hide();
+        },100)
     })
 
     $('body').on('keyup','#table-items input[name="items-qty[]"],#table-items input[name="items-batch_no[]"],textarea[name="items-serial_no[]"]',function(){
@@ -208,6 +253,7 @@ $(document).ready(function(){
             html += $this.parents('tr').html();
             html += '<td class="batch_no"><span class="td-label">-</span><input type="hidden" name="items-batch_no[]" value="-"></td>';
             html += '<td class="serial_no"><span class="td-label">-</span><input type="hidden" name="items-serial_no[]" value="-"></td>';
+            html += '<td class="batch_no_bdk"><span class="td-label">-</span><select class="hidden myselect2" name="items-batch_no_bdk_2[]" multiple="multiple"><option value=""></option></select></td>';
             html += '<td>'+
                         '<a href="#panel-form-items" onclick="editRowitems(this)" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i></a> '+
                         '<a href="javascript:void(0)" onclick="deleteRowitems(this)" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>'+
@@ -256,25 +302,82 @@ $(document).ready(function(){
     })
 
     var serial_no = '';
+    var batch_no_bdk = '';    
+    
     $('table#table-detail tbody').find('table#table-detail tbody tr').each(function(){
         var $this = $(this);
             
         serial_no = $($this).find('td.serial_no').find('span').html();
         if(serial_no){
-            console.log(serial_no);  
+            // console.log(serial_no);  
             serial_no = serial_no.trim();
             serial_no = serial_no.split(",").join("<br>");
             $($this).find('td.serial_no').find('span').html(serial_no);
         }     
-            
+
+        batch_no_bdk = $($this).find('td.batch_no_bdk').find('span').html();        
+        if(batch_no_bdk){ 
+            batch_no_bdk = batch_no_bdk.trim();
+            batch_no_bdk = batch_no_bdk.split("|||").join("<br>");
+            $($this).find('td.batch_no_bdk').find('span').html(batch_no_bdk);
+        }
     })
 
     numberingChildTable();
+
+    $(document).on('change','.myselect2', function (e) {
+        // var data = e.params.data;
+        var $this = $(this)
+        var data = $this.val();
+        if(data){
+            $this.parent().find('[name="items-batch_no_bdk[]"]').val(data.join('|||'));
+        }        
+    });
+   
 });
 
 function setSelect2(val){
     $(".myselect2").select2({
         tags: true
+    });
+}
+
+function getbatchNoBDK(po, item, $this,datas){
+    console.log(datas.split('<br>'));
+    var datas = datas.split('<br>');
+    var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
+    var data = [];
+    // $('select.myselect2').val(null).trigger('change');
+    $this.parents('tr').find('select.myselect2').empty();
+    $.get(_url, function(res){
+        data = res.data;
+        // console.log(data.items.length);
+        if(data.length){
+            $.each(data.items, function(k,v){
+                var d = {
+                    id: v.batch_no,
+                    text: v.batch_no
+                };    
+                var newOption = new Option(d.text, d.id, false, false);
+                $this.parents('tr').find('select.myselect2').append(newOption).trigger('change');
+            })
+        } else {
+            $.each(datas, function(k,v){
+                if(v != '-'){
+                    var d = {
+                        id: v,
+                        text: v
+                    };    
+                    var newOption = new Option(d.text, d.id, false, false);
+                    $this.parents('tr').find('select.myselect2').append(newOption).trigger('change');
+                }
+            })
+        }
+        
+        
+        
+    }).done(function(){
+        $this.parents('tr').find('select.myselect2').val(datas).change();
     });
 }
 
@@ -285,14 +388,24 @@ function numberingChildTable(){
         $this.attr('data-no',no);
         
         var serial_no = $($this).find('td.serial_no').find('span').html();
-            if(serial_no){
-                console.log('1 : '+serial_no);  
-                serial_no = serial_no.trim();
-                serial_no = serial_no.split(",").join("<br>");
-                serial_no = serial_no.split("\n").join("<br>");
-                $($this).find('td.serial_no').find('span').html(serial_no);
-                console.log('2 : '+serial_no);
-            }     
+        if(serial_no){
+            // console.log('1 : '+serial_no);  
+            serial_no = serial_no.trim();
+            serial_no = serial_no.split(",").join("<br>");
+            serial_no = serial_no.split("\n").join("<br>");
+            $($this).find('td.serial_no').find('span').html(serial_no);
+            // console.log('2 : '+serial_no);
+        }
+        
+        var batch_no_bdk = $($this).find('td.batch_no_bdk').find('span').html();
+        if(batch_no_bdk){
+            // console.log('1 : '+serial_no);  
+            batch_no_bdk = batch_no_bdk.trim();
+            batch_no_bdk = batch_no_bdk.split("|||").join("<br>");
+            // batch_no_bdk = batch_no_bdk.split("\n").join("<br>");
+            $($this).find('td.batch_no_bdk').find('span').html(batch_no_bdk);
+            // console.log('2 : '+serial_no);
+        }
             
         no++;
     })
@@ -340,6 +453,7 @@ function autoInputItem(items){
         $('#panel-form-items').find('#itemsuom').val(v.stock_uom);
         $('#panel-form-items').find('#itemsbatch_no').val('-');
         $('#panel-form-items').find('#itemsserial_no').val('-');
+        $('#panel-form-items').find('#itemsbatch_no_bdk').val('-');
         addToTableitems();
     });
 }
@@ -469,8 +583,8 @@ function setDBItems(){
 function hideField(){
     $(document).find('#itemsrate').closest('.form-group').hide();
     $(document).find('#itemsamount').closest('.form-group').hide();
-    $('table#table-items').find('thead th:eq(7)').hide();
     $('table#table-items').find('thead th:eq(8)').hide();
+    $('table#table-items').find('thead th:eq(9)').hide();
     $('table#table-items').find('tbody td.rate').hide();
     $('table#table-items').find('tbody td.amount').hide();
 }

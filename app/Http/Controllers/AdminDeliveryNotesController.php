@@ -67,6 +67,7 @@
 			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10','readonly'=>true];
 			$columns[] 		= ['label'=>'Batch No','name'=>'batch_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'textarea','validation'=>'','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Batch No BDK','name'=>'batch_no_bdk','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			// $columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			// $columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			
@@ -247,7 +248,12 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = "tr.selected{background-color: lightskyblue !important;}";
+			$this->style_css = "
+				tr.selected{background-color: lightskyblue !important;}
+				.select2-selection__rendered {
+					width: 150px !important;
+				}
+			";
 	        
 	        
 	        
@@ -342,7 +348,6 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 			//Your code here
-
 			$new = [];
 			foreach($_POST['items-qty'] as $k => $val){
 				if($val){
@@ -377,6 +382,18 @@
 				}
 			}
 			Request::merge(['items-serial_no'=>$new]);
+
+			$new = [];
+			foreach($_POST['items-batch_no_bdk'] as $k => $val){
+				if($val){
+					$new[$k] = $val;
+				} else{
+					$new[$k] = '-';
+				}
+			}
+			Request::merge(['items-batch_no_bdk'=>$new]);
+
+			Request::offsetUnset('items-batch_no_bdk_2');
 			
 			// pr($_POST);
 			// pr(Request::all(),1);
@@ -661,7 +678,37 @@
 
 			return $data->message;
 		}
-	    //By the way, you can still create your own method in here... :) 
+		
+		public function getBatchnobdk($id){
+			$doctype 		= 'Purchase Receipt Schedule';
+			$fields 		= "*";
+			
+			$param 			= explode('__',$id);
+			$po				= @$param[0];
+			$item_code		= @$param[1];
+
+			$filters['purchase_order'] 	= ['=',$po];
+			// $filters['item_code']		= ['=',$item_code];
+			$filters = json_encode($filters);
+
+			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_data_detail_filters';
+			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+			$res 	= $client->request('GET', $this->_host.$_url, [
+				'query' => [
+					'doctype' => $doctype,
+					'filters' => $filters
+					// 'group_by' => 'purchase_order'
+					]
+			]);
+			$data = json_decode($res->getBody()->getContents());
+
+			// pr($datas);
+			$response = @$data->message;			
+			if(request()->ajax()){
+				$response =  response()->json($response);
+			}
+			return $response;
+		}
 
 
 	}
