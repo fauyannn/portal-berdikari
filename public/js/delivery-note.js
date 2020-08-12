@@ -348,8 +348,7 @@ function setSelect2(val){
 function getbatchNoBDK(po, item, $this,datas){
     console.log(datas.split('<br>'));
     var datas = datas.split('<br>');
-    // var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
-    var _url = '/admin/delivery_notes/batchnobdk/'+po;
+    var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
     var data = [];
     var newdata = [];
     // $('select.myselect2').val(null).trigger('change');
