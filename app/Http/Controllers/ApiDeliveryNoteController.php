@@ -10,7 +10,7 @@
 		    function __construct() {    
 				$this->table       = "delivery_notes";        
 				$this->permalink   = "delivery_note";    
-				$this->method_type = "get";    
+				$this->method_type = "get";
 		    }
 		
 
@@ -44,7 +44,7 @@
 				if(count($items)){
 					foreach($items as $k => $val){
 						$items[$k]->batch_no = ($val->batch_no == '-') ? '' : $val->batch_no;
-						$items[$k]->serial_no = ($val->serial_no == '-') ? '' : $val->serial_no;
+						$items[$k]->serial_no = ($val->serial_no == '-') ? '' : str_replace(",","\r\n",$val->serial_no);
 					}
 				}
 				return $result['items'] = $items;

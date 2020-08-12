@@ -107,7 +107,8 @@ $(document).ready(function(){
             var po = $this.parents('tr').find('[name="items-purchase_order[]"]').val();
             var item = $this.parents('tr').find('[name="items-item_code[]"]').val();
             var datas = $this.parents('tr').find('.batch_no_bdk span').html();
-            console.log(datas)
+            // console.log('22222')
+            // console.log(datas)
             getbatchNoBDK(po, item, $this,datas);
         }
 
@@ -329,9 +330,11 @@ $(document).ready(function(){
         // var data = e.params.data;
         var $this = $(this)
         var data = $this.val();
+        // console.log(data)
+        $this.parent().find('[name="items-batch_no_bdk[]"]').val('-');
         if(data){
             $this.parent().find('[name="items-batch_no_bdk[]"]').val(data.join('|||'));
-        }        
+        }    
     });
    
 });
@@ -345,34 +348,40 @@ function setSelect2(val){
 function getbatchNoBDK(po, item, $this,datas){
     console.log(datas.split('<br>'));
     var datas = datas.split('<br>');
-    var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
+    // var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
+    var _url = '/admin/delivery_notes/batchnobdk/'+po;
     var data = [];
+    var newdata = [];
     // $('select.myselect2').val(null).trigger('change');
     $this.parents('tr').find('select.myselect2').empty();
     $.get(_url, function(res){
         data = res.data;
-        // console.log(data.items.length);
-        if(data.length){
+        var no = 0;
+        if(data.items){
             $.each(data.items, function(k,v){
-                var d = {
-                    id: v.batch_no,
-                    text: v.batch_no
-                };    
-                var newOption = new Option(d.text, d.id, false, false);
-                $this.parents('tr').find('select.myselect2').append(newOption).trigger('change');
-            })
-        } else {
-            $.each(datas, function(k,v){
-                if(v != '-'){
-                    var d = {
-                        id: v,
-                        text: v
-                    };    
-                    var newOption = new Option(d.text, d.id, false, false);
-                    $this.parents('tr').find('select.myselect2').append(newOption).trigger('change');
-                }
+                newdata[no] = v.batch_no;
+                no++;
             })
         }
+        if(datas.length){
+            $.each(datas, function(k,v){
+                if(newdata.indexOf(v)<0){
+                    newdata[no] = v;
+                    no++;
+                }
+            })
+        }        
+        // console.log(newdata);
+        $.each(newdata, function(k,v){
+            if(v != '-'){
+                var d = {
+                    id: v,
+                    text: v
+                };
+                var newOption = new Option(d.text, d.id, false, false);
+                $this.parents('tr').find('select.myselect2').append(newOption).trigger('change');
+            }
+        })
         
         
         

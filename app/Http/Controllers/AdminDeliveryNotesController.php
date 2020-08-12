@@ -659,8 +659,7 @@
 			}
 			return $data = response()->json($datas);
 		}
-		public function getGenerateqr($id){
-			
+		public function getGenerateqr($id){			
 			$_url 	= '/api/method/qr_reader.api.generate';
 			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
 			$res 	= $client->request('GET', $this->_host.$_url, [
@@ -702,7 +701,6 @@
 			]);
 			$data = json_decode($res->getBody()->getContents());
 
-			// pr($datas);
 			$response = @$data->message;			
 			if(request()->ajax()){
 				$response =  response()->json($response);
