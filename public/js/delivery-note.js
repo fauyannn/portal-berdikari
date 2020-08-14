@@ -88,7 +88,7 @@ $(document).ready(function(){
         if($this.parents('tr').find('[name="items-batch_no_bdk[]"]').length){
             var elm = $this.parents('tr').find('[name="items-batch_no_bdk[]"]');    
             // var val = elm.val();
-            var field_batch_no_bdk = '<select class="hidden myselect2" name="items-batch_no_bdk_2[]" multiple="multiple"><option value=""></option></select>';
+            var field_batch_no_bdk = '<select class="hidden myselect2" name="items-batch_no_bdk_2[]" multiple="multiple"></select>';
             // textarea_serial_no = '<select class="myselect2 form-control" name="items-serial_no['+no+'][]" multiple="multiple"><option></option></select>';
             if(!$this.parents('tr').find('select.myselect2').length){
                 elm.before(field_batch_no_bdk);
@@ -99,7 +99,7 @@ $(document).ready(function(){
             
             elm.prop('name','items-batch_no_bdk[]');
             // $this.parents('tr').find('td.batch_no_bdk').find('[name="items-batch_no_bdk[]"]'); 
-            setSelect2(1);
+            
             $this.parents('table').find('span.select2').hide();
             $this.parents('table').find('tr.active').find('span.select2').show();
             $this.parents('tr').find('td.batch_no_bdk').find('span.select2').show();
@@ -107,8 +107,14 @@ $(document).ready(function(){
             var po = $this.parents('tr').find('[name="items-purchase_order[]"]').val();
             var item = $this.parents('tr').find('[name="items-item_code[]"]').val();
             var datas = $this.parents('tr').find('.batch_no_bdk span').html();
-            // console.log('22222')
+            console.log('2222222222222222222')
             // console.log(datas)
+            // setTimeout(function(){
+            //     setSelect2(1);
+            // },1000)
+            $this.parents('tr').find(".myselect2").select2({
+                tags: true
+            });
             getbatchNoBDK(po, item, $this,datas);
         }
 
@@ -125,8 +131,10 @@ $(document).ready(function(){
         $this.parents('tr').find('td.serial_no').find('span').html(seial_no_html);
 
         var batch_no_bdk = $this.parents('tr').find('td.batch_no_bdk').find('[name="items-batch_no_bdk[]"]').val();
-        var batch_no_bdk_html = batch_no_bdk.split("|||").join("<br>");
-        console.log(batch_no_bdk)
+        if(batch_no_bdk){
+            var batch_no_bdk_html = batch_no_bdk.split("|||").join("<br>");
+        }        
+        // console.log(batch_no_bdk)
         $this.parents('tr').find('td.batch_no_bdk').find('span').html(batch_no_bdk_html);
 
         $this.parents('tr').removeClass('active');
@@ -254,7 +262,7 @@ $(document).ready(function(){
             html += $this.parents('tr').html();
             html += '<td class="batch_no"><span class="td-label">-</span><input type="hidden" name="items-batch_no[]" value="-"></td>';
             html += '<td class="serial_no"><span class="td-label">-</span><input type="hidden" name="items-serial_no[]" value="-"></td>';
-            html += '<td class="batch_no_bdk"><span class="td-label">-</span><select class="hidden myselect2" name="items-batch_no_bdk_2[]" multiple="multiple"><option value=""></option></select></td>';
+            html += '<td class="batch_no_bdk"><span class="td-label">-</span><select class="hidden myselect2" name="items-batch_no_bdk_2[]" multiple="multiple"></select><input type="hidden" name="items-batch_no_bdk[]" value="-" style="display: none;"></td>';
             html += '<td>'+
                         '<a href="#panel-form-items" onclick="editRowitems(this)" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i></a> '+
                         '<a href="javascript:void(0)" onclick="deleteRowitems(this)" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>'+
@@ -595,6 +603,10 @@ function hideField(){
     $('table#table-items').find('thead th:eq(9)').hide();
     $('table#table-items').find('tbody td.rate').hide();
     $('table#table-items').find('tbody td.amount').hide();
+    // alert(324);
+    $('table#table-items tbody tr').each(function(k,v){
+        $(v).find('td:last').attr('width','80px');
+    })
 }
 
 function printDiv(divName) {
