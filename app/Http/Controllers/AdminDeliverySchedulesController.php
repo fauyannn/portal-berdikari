@@ -388,7 +388,9 @@
 					}
 				}
 			}
-			
+			if($_GET['q']){
+				$filters['supplier'] = ['LIKE','%'.$_GET['q'].'%'];
+			}
 			// $filters['purchase_order'] = ['!=',''];
 			if(!CRUDBooster::isSuperadmin()){
 				$user = getUser();
@@ -541,10 +543,10 @@
 			$items = [];
 			if(count($data->data)){
 				foreach($data->data as $k => $val){
-					$po['po'][$val->purchase_order] = $val->purchase_order;
+					$po['schedule_date'][$val->schedule_date] = $val->schedule_date;
 					$po['item_code'][$val->item_code] = $val->item_code;
 				}
-				$items = getItemPO($po);
+				//$items = getItemPO_v2($po);
 			}
 			
 			return view('delivery_schedule_detail',compact('data','items'));
