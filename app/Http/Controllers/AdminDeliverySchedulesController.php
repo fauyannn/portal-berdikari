@@ -363,7 +363,7 @@
 			$this->table = "delivery_schedules";
 			// pr($_GET);
 			
-			$order_by 		= 'schedule_date desc'; //default
+			$order_by 		= 'modified desc'; //default
 			$filters		= [];
 			$arrfield = [
 				$this->table.'.supplier' => 'supplier',
@@ -389,7 +389,7 @@
 				}
 			}
 			
-			$filters['purchase_order'] = ['!=',''];
+			// $filters['purchase_order'] = ['!=',''];
 			if(!CRUDBooster::isSuperadmin()){
 				$user = getUser();
 				$supplier = $user->company;
@@ -511,7 +511,6 @@
 
 			$filters['supplier'] = ['=',$supplier];
 			$filters['schedule_date'] = ['=',$schedule_date];
-			$filters['purchase_order'] = ['!=',''];
 			$filters = json_encode($filters);
 
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
