@@ -389,6 +389,7 @@
 				}
 			}
 			
+			$filters['purchase_order'] = ['!=',''];
 			if(!CRUDBooster::isSuperadmin()){
 				$user = getUser();
 				$supplier = $user->company;
@@ -500,7 +501,7 @@
 			$start 			= 0;
 			$page_length 	= 500;
 			$order_by       = 'modified desc';
-			$fields 		= "purchase_order,item_code,item_name,qty,stock_uom,rate";
+			$fields 		= "name,purchase_order,item_code,item_name,qty,stock_uom,rate";
 			// $fields 		= "*";
 			
 			$param 			= explode('__',$id);
@@ -510,6 +511,7 @@
 
 			$filters['supplier'] = ['=',$supplier];
 			$filters['schedule_date'] = ['=',$schedule_date];
+			$filters['purchase_order'] = ['!=',''];
 			$filters = json_encode($filters);
 
 			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_all_data';
@@ -535,16 +537,17 @@
 			// $data['message']['data']['supplier'] = $supplier;
 			// $data['message']['data']['schedule_date'] = $schedule_date;
 			$data = $data->message;
+			
 			$po = [];
+			$items = [];
 			if(count($data->data)){
 				foreach($data->data as $k => $val){
 					$po['po'][$val->purchase_order] = $val->purchase_order;
 					$po['item_code'][$val->item_code] = $val->item_code;
 				}
+				$items = getItemPO($po);
 			}
-			$items = getItemPO($po);
 			
-			// pr($items);
 			return view('delivery_schedule_detail',compact('data','items'));
 		}
 
