@@ -361,7 +361,7 @@
 		public function getQuery($id){
 			// $_GET			= $_GET;
 			$this->table = "delivery_schedules";
-			// pr($_GET);
+			//pr($_GET);
 			
 			$order_by 		= 'modified desc'; //default
 			$filters		= [];
@@ -387,6 +387,9 @@
 						}
 					}
 				}
+			}
+			if($_GET['q']){
+				$filters['supplier'] = ['LIKE','%'.$_GET['q'].'%'];
 			}
 			
 			// $filters['purchase_order'] = ['!=',''];

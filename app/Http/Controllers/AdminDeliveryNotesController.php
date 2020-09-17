@@ -66,7 +66,7 @@
 			$columns[] 		= ['label'=>'QTY','name'=>'qty','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10','readonly'=>false];
 			$columns[] 		= ['label'=>'UOM','name'=>'uom','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10','readonly'=>true];
 			$columns[] 		= ['label'=>'Batch No','name'=>'batch_no','type'=>'text','validation'=>'','width'=>'col-sm-10'];
-			$columns[] 		= ['label'=>'Serial No','name'=>'serial_no','type'=>'textarea','validation'=>'','width'=>'col-sm-10'];
+			$columns[] 		= ['label'=>'Packaging No','name'=>'serial_no','type'=>'textarea','validation'=>'','width'=>'col-sm-10'];
 			$columns[] 		= ['label'=>'Batch No BDK','name'=>'batch_no_bdk','type'=>'text','validation'=>'','width'=>'col-sm-10'];
 			// $columns[] 		= ['label'=>'Rate','name'=>'rate','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			// $columns[] 		= ['label'=>'Amount','name'=>'amount','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];

@@ -107,7 +107,7 @@ $(document).ready(function(){
             var po = $this.parents('tr').find('[name="items-purchase_order[]"]').val();
             var item = $this.parents('tr').find('[name="items-item_code[]"]').val();
             var datas = $this.parents('tr').find('.batch_no_bdk span').html();
-            console.log('2222222222222222222')
+            // console.log('2222222222222222222')
             // console.log(datas)
             // setTimeout(function(){
             //     setSelect2(1);
@@ -354,7 +354,7 @@ function setSelect2(val){
 }
 
 function getbatchNoBDK(po, item, $this,datas){
-    console.log(datas.split('<br>'));
+    //console.log(datas.split('<br>'));
     var datas = datas.split('<br>');
     var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
     var data = [];

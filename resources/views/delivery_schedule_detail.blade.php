@@ -46,8 +46,6 @@
                                                     <th>Item Name</th>
                                                     <th>QTY</th>
                                                     <th>UOM</th>
-                                                    <th>Rate</th>
-                                                    <th>Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -69,12 +67,6 @@
                                                             </td>
                                                             <td class="">
                                                                 <span class="td-label">{{ ($item->stock_uom) }}</span>
-                                                            </td>
-                                                            <td class="">
-                                                                <span class="td-label right">{{ formatMoney($item->rate) }}</span>
-                                                            </td>
-                                                            <td class="">
-                                                                <span class="td-label right">{{ formatMoney($item->amount) }}</span>
                                                             </td>
                                                         </tr>
                                                     @endforeach
