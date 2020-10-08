@@ -678,35 +678,65 @@
 			return $data->message;
 		}
 		
+
 		public function getBatchnobdk($id){
-			$doctype 		= 'Purchase Receipt Schedule';
+			// $doctype 		= 'Purchase Receipt Schedule';
 			$fields 		= "*";
 			
 			$param 			= explode('__',$id);
 			$po				= @$param[0];
-			$item_code		= @$param[1];
+			$item_code		= str_replace('|','/',@$param[1]);
 
-			$filters['purchase_order'] 	= ['=',$po];
-			// $filters['item_code']		= ['=',$item_code];
-			$filters = json_encode($filters);
+			$data = DB::table('stock')
+				->leftJoin('stock_detail','stock_item_id','=','stock.id')
+				->where('stock.item_code',$item_code)
+				->get(['stock_detail.batch_no']);
 
-			$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_data_detail_filters';
-			$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
-			$res 	= $client->request('GET', $this->_host.$_url, [
-				'query' => [
-					'doctype' => $doctype,
-					'filters' => $filters
-					// 'group_by' => 'purchase_order'
-					]
-			]);
-			$data = json_decode($res->getBody()->getContents());
-
-			$response = @$data->message;			
+			$batch_no = [];
+			foreach($data as $k => $val){
+				$bns = explode(',',$val->batch_no);
+				foreach($bns as $v){
+					$batch_no[$v] = $v;
+				}				
+			}
+				
+			$response = ['item_code'=>$item_code, 'data'=>$batch_no];
 			if(request()->ajax()){
 				$response =  response()->json($response);
 			}
 			return $response;
 		}
+
+		// Batch no from ERP
+		// public function getBatchnobdk($id){
+		// 	$doctype 		= 'Purchase Receipt Schedule';
+		// 	$fields 		= "*";
+			
+		// 	$param 			= explode('__',$id);
+		// 	$po				= @$param[0];
+		// 	$item_code		= @$param[1];
+
+		// 	$filters['purchase_order'] 	= ['=',$po];
+		// 	// $filters['item_code']		= ['=',$item_code];
+		// 	$filters = json_encode($filters);
+
+		// 	$_url 	= '/api/method/counting_machine.counting_machine.doctype.counting_machine.counting_machine.get_data_detail_filters';
+		// 	$client = new \GuzzleHttp\Client(['headers' => ['Authorization' => $this->_token]]);
+		// 	$res 	= $client->request('GET', $this->_host.$_url, [
+		// 		'query' => [
+		// 			'doctype' => $doctype,
+		// 			'filters' => $filters
+		// 			// 'group_by' => 'purchase_order'
+		// 			]
+		// 	]);
+		// 	$data = json_decode($res->getBody()->getContents());
+
+		// 	$response = @$data->message;			
+		// 	if(request()->ajax()){
+		// 		$response =  response()->json($response);
+		// 	}
+		// 	return $response;
+		// }
 
 
 	}

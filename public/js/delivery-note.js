@@ -356,6 +356,54 @@ function setSelect2(val){
 function getbatchNoBDK(po, item, $this,datas){
     //console.log(datas.split('<br>'));
     var datas = datas.split('<br>');
+    item = item.replace('/','|');
+    var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
+    var data = [];
+    var newdata = [];
+    // $('select.myselect2').val(null).trigger('change');
+    $this.parents('tr').find('select.myselect2').empty();
+    $.get(_url, function(res){
+        
+        data = res.data;
+        console.log(data);
+        var no = 0;
+        if(data){
+            $.each(data, function(k,v){
+                newdata[no] = v;
+                no++;
+            })
+        }
+        if(datas.length){
+            $.each(datas, function(k,v){
+                if(newdata.indexOf(v)<0){
+                    newdata[no] = v;
+                    no++;
+                }
+            })
+        }        
+        // console.log(newdata);
+        $.each(newdata, function(k,v){
+            if(v != '-'){
+                var d = {
+                    id: v,
+                    text: v
+                };
+                var newOption = new Option(d.text, d.id, false, false);
+                $this.parents('tr').find('select.myselect2').append(newOption).trigger('change');
+            }
+        })
+        
+        
+        
+    }).done(function(){
+        $this.parents('tr').find('select.myselect2').val(datas).change();
+    });
+}
+
+
+function getbatchNoBDK_dariERP(po, item, $this,datas){
+    //console.log(datas.split('<br>'));
+    var datas = datas.split('<br>');
     var _url = '/admin/delivery_notes/batchnobdk/'+po+'__'+item;
     var data = [];
     var newdata = [];
