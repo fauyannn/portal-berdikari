@@ -32,25 +32,25 @@ class AdminStockListController extends Controller
         } else if ($company === null) {
             return redirect('/admin/stocklist/select_company');
         }
-        $raws = Stock::select('stock.*', DB::raw('SUM(amount) as total_amount'))
+        $raws = Stock::select('stock.item_code', 'stock.item_name', DB::raw('SUM(amount) as total_amount'))
             ->where('supplier', $company)
             ->where('stock_detail.type', 'raw' )
             ->join('stock_detail','stock_detail.stock_item_id', '=', 'stock.id')
-            ->groupBy('stock.id')
+            ->groupBy('stock.id','stock.item_code', 'stock.item_name')
             ->get();
 
-        $fgs = Stock::select('stock.*', DB::raw('SUM(amount) as total_amount'))
+        $fgs = Stock::select('stock.item_code', 'stock.item_name', DB::raw('SUM(amount) as total_amount'))
             ->where('supplier', $company)
             ->where('stock_detail.type', 'fg' )
             ->join('stock_detail','stock_detail.stock_item_id', '=', 'stock.id')
-            ->groupBy('stock.id')
+            ->groupBy('stock.id','stock.item_code', 'stock.item_name')
             ->get();
 
-        $ngs = Stock::select('stock.*', DB::raw('SUM(amount) as total_amount'))
+        $ngs = Stock::select('stock.item_code', 'stock.item_name', DB::raw('SUM(amount) as total_amount'))
             ->where('supplier', $company)
             ->where('stock_detail.type', 'ng' )
             ->join('stock_detail','stock_detail.stock_item_id', '=', 'stock.id')
-            ->groupBy('stock.id')
+            ->groupBy('stock.id','stock.item_code', 'stock.item_name')
             ->get();
 
 

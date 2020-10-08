@@ -24,8 +24,8 @@ $(document).ready(function(){
 function showMaterials(data) {
   let body = $('tbody');
   body.empty();
-  let row = $('<tr></tr>');
   for (let material of data){
+    let row = $('<tr></tr>');
     let name = `<td> ${material.item_name}</td>`;
     row.append(name);
 
@@ -53,7 +53,6 @@ function showMaterials(data) {
 
     let uomColumn = $(`<td>${material.uom}</td>`);
     row.append(uomColumn);
+    body.append(row);
   }
-
-  body.append(row);
 }
