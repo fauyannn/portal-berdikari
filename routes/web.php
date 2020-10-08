@@ -19,7 +19,11 @@ Route::get('/', function () {
 Route::prefix('admin/stocklist')->group(function (){
     Route::get('/', 'AdminStockListController@index');
     Route::get('/company/{company?}', 'AdminStockListController@index');
+    Route::get('/detail/{item}', 'AdminStockListController@stockDetail');
     Route::post('/submit', 'AdminStockListController@submit');
+    Route::get('/process', 'AdminStockListController@processRaw');
+    Route::post('/submit_process', 'AdminStockListController@submitProcess');
+    Route::get('/bom_detail/{name}', 'AdminStockListController@bomDetail');
     Route::post('/processqr', 'AdminStockListController@processQr');
     Route::post('/processqr/company/{company?}', 'AdminStockListController@processQr');
     Route::get('/select_company', 'AdminStockListController@selectCompany');
